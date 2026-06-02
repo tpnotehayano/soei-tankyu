@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>探Q LAB ｜ 横浜創英 探求ラボ</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --ink:#1d2740;
+    --ink-soft:#5b6680;
+    --line:#e6e9f2;
+    --card:#ffffff;
+    --brand:#3a6df0;
+    --brand-soft:#eaf0ff;
+    --brand-deep:#23409c;
+    --accent:#10b3a3;
+    --gold:#f0b429;
+    --pink:#f0567f;
+    --purple:#8b5cf6;
+    --shadow:0 10px 30px -12px rgba(29,39,64,.22);
+    --shadow-sm:0 4px 14px -8px rgba(29,39,64,.25);
+    --radius:22px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #e9f0ff 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, #e6fbf6 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.7;
+  }
+  .app{max-width:720px;margin:0 auto;min-height:100%;position:relative;}
+  .screen{display:none;padding:0 20px 120px;animation:fade .45s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  h1,h2,h3,p{margin:0;}
+
+  /* ---------- PIN / LOCK ---------- */
+  #lock{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:100vh;padding:30px;text-align:center;
+    background:#ffffff;
+  }
+  #lock.active{display:flex;}
+  .badge-logo{
+    width:84px;height:84px;border-radius:24px;margin-bottom:22px;
+    background:linear-gradient(135deg,var(--brand),var(--brand-deep));
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 16px 34px -12px rgba(58,109,240,.6);
+    color:#fff;font-size:38px;
+  }
+  .lock-title{font-size:26px;font-weight:800;letter-spacing:.02em;}
+  .lock-sub{color:var(--ink-soft);font-size:14px;margin-top:6px;margin-bottom:30px;}
+  .pin-dots{display:flex;gap:14px;margin-bottom:8px;height:18px;}
+  .pin-dots .d{width:14px;height:14px;border-radius:50%;background:#d4dae8;transition:.2s;}
+  .pin-dots .d.on{background:var(--brand);transform:scale(1.15);}
+  .pin-msg{height:22px;font-size:13px;color:var(--pink);font-weight:600;margin:8px 0 18px;}
+  .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:min(300px,80vw);}
+  .key{
+    height:64px;border-radius:18px;font-size:24px;font-weight:800;transition:.12s;
+    color:var(--brand-deep);
+    background:linear-gradient(180deg,#f3f7ff,#e6edfb);
+    border:1.5px solid #cdd9f2;
+    box-shadow:0 4px 10px -4px rgba(35,64,156,.25),inset 0 1px 0 #fff;
+  }
+  .key:active{transform:scale(.94);background:linear-gradient(180deg,#d8e4ff,#c2d3f7);border-color:var(--brand);}
+  .key.fn{font-size:14px;font-weight:700;color:var(--ink-soft);background:transparent;border:1.5px solid transparent;box-shadow:none;}
+  .key.fn:active{background:#eef1f8;}
+  .lock-hint{margin-top:26px;font-size:12px;color:#9aa3ba;}
+
+  /* ---------- HEADER ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
+    background:rgba(245,247,251,.82);
+    padding:16px 20px 12px;margin:0 -20px 6px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:12px;
+  }
+  .topbar .mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand-deep));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;}
+  .topbar .ttl{font-weight:800;font-size:16px;letter-spacing:.02em;}
+  .topbar .ttl small{display:block;font-weight:600;font-size:11px;color:var(--ink-soft);letter-spacing:.04em;}
+  .topbar .spacer{flex:1;}
+  .icon-btn{width:38px;height:38px;border-radius:12px;background:var(--card);box-shadow:var(--shadow-sm);font-size:16px;display:flex;align-items:center;justify-content:center;}
+
+  /* ---------- HOME ---------- */
+  .hero{
+    margin-top:14px;padding:24px;border-radius:var(--radius);
+    background:linear-gradient(120deg,#00A0E9,#7b5cf0 55%,#E4007F);color:#fff;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  .hero-slim{padding:22px 24px;text-align:center;}
+  .hero-slim h2{font-size:clamp(20px,5.6vw,28px);font-weight:900;letter-spacing:.01em;position:relative;}
+  .hero:before{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.12);}
+  .hero:after{content:"";position:absolute;right:40px;bottom:-60px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);}
+  .hero h2{font-size:22px;font-weight:800;position:relative;}
+  .hero p{font-size:13.5px;opacity:.92;margin-top:8px;position:relative;max-width:80%;}
+  .hero .prog-wrap{margin-top:18px;position:relative;}
+  .hero .prog-bar{height:9px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden;}
+  .hero .prog-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7af0d9,#fff);border-radius:99px;transition:width .6s;}
+  .hero .prog-label{font-size:11.5px;margin-top:7px;opacity:.9;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+  .tile{
+    background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm);
+    border:1px solid var(--line);transition:.15s;text-align:left;display:flex;flex-direction:column;min-height:138px;
+  }
+  .tile:active{transform:scale(.97);}
+  .tile .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:auto;}
+  .tile h3{font-size:15.5px;font-weight:800;margin-top:12px;}
+  .tile p{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+  .tile .tag{font-size:10px;font-weight:700;color:var(--brand);background:var(--brand-soft);padding:2px 8px;border-radius:99px;align-self:flex-start;margin-top:10px;}
+  .tile.full{grid-column:1/-1;flex-direction:row;align-items:center;min-height:auto;gap:16px;}
+  .tile.full .ic{margin-bottom:0;}
+  .tile.full .txt{flex:1;}
+  .tile.full h3{margin-top:0;}
+  .ic.blue{background:var(--brand-soft);color:var(--brand);}
+  .ic.teal{background:#e3faf6;color:var(--accent);}
+  .ic.gold{background:#fef3d6;color:#c98a06;}
+  .ic.pink{background:#fde8ee;color:var(--pink);}
+  .ic.purple{background:#f0eafe;color:var(--purple);}
+
+  .section-h{display:flex;align-items:baseline;gap:10px;margin:26px 4px 12px;}
+  .section-h h2{font-size:17px;font-weight:800;}
+  .section-h span{font-size:11px;color:var(--ink-soft);}
+
+  /* ---------- CIRCLE HUB ---------- */
+  .hub-wrap{display:flex;justify-content:center;margin-top:10px;overflow:visible;}
+  .hub{position:relative;width:min(96vw,560px);aspect-ratio:1;}
+  .hub-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 22px rgba(29,39,64,.12));}
+  .hub-core{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:31%;height:31%;border-radius:50%;background:linear-gradient(150deg,#ffffff,#eef3ff);
+    box-shadow:0 16px 34px -10px rgba(35,64,156,.4),0 0 0 7px rgba(255,255,255,.85);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px solid var(--line);z-index:3;
+  }
+  .hub-core:active{transform:translate(-50%,-50%) scale(.95);}
+  .hub-core .ctitle{font-size:clamp(14px,4vw,19px);font-weight:900;color:var(--brand-deep);letter-spacing:.02em;line-height:1.15;}
+  .hub-core .csub{font-size:clamp(8px,2.2vw,10px);font-weight:800;color:#aab2c6;letter-spacing:.18em;margin-top:1px;}
+  .hub-core .carrow{font-size:clamp(9px,2.4vw,11px);color:var(--brand);margin-top:4px;font-weight:800;}
+  .hub-node{position:absolute;transform:translate(-50%,-50%);width:23%;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;z-index:2;}
+  .hub-node.up{flex-direction:column-reverse;}
+  .hub-node .nc{
+    width:clamp(44px,12.5vw,60px);height:clamp(44px,12.5vw,60px);border-radius:50%;background:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:clamp(21px,5.6vw,27px);
+    border:3px solid #fff;transition:.13s;position:relative;
+  }
+  .hub-node:active .nc{transform:scale(.88);}
+  .hub-node .nl{font-size:clamp(9.5px,2.7vw,12px);font-weight:800;color:var(--ink);line-height:1.15;text-shadow:0 1px 3px rgba(255,255,255,.95);}
+  .hub-node .chk{position:absolute;top:-4px;right:-4px;width:19px;height:19px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
+
+  /* ---------- BRAND LOGO / MASCOT ---------- */
+  .lock-logo{width:min(78vw,320px);height:auto;display:block;margin:0 auto 18px;}
+  .topbar-logo{height:30px;width:auto;display:block;}
+  .bot-ike{width:46px;height:46px;object-fit:contain;border-radius:50%;background:#fff;}
+  .bot-head .av .bot-ike{width:32px;height:32px;}
+
+  /* ---------- INQUIRY (探求授業とは) ---------- */
+  .poster-btn{display:block;width:100%;padding:0;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--line);background:#fff;}
+  .poster-btn img{width:100%;display:block;}
+  .poster-cap{font-size:11px;color:var(--ink-soft);text-align:center;margin-top:6px;}
+  .iq-hero{border-radius:var(--radius);padding:22px;color:#fff;box-shadow:var(--shadow);margin-bottom:16px;position:relative;overflow:hidden;
+    background:linear-gradient(120deg,#00A0E9,#7b5cf0 55%,#E4007F);}
+  .iq-hero:before{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.13);}
+  .iq-hero .tagline{font-size:13px;font-weight:700;opacity:.95;}
+  .iq-hero h2{font-size:22px;font-weight:900;margin-top:6px;line-height:1.4;}
+  .iq-hero p{font-size:12.5px;opacity:.95;margin-top:8px;}
+  .iq-talk{display:flex;gap:12px;align-items:flex-start;background:var(--card);border-radius:18px;padding:16px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:16px;}
+  .iq-talk img{width:54px;height:54px;flex:none;object-fit:contain;}
+  .iq-talk .sp{font-size:13.5px;line-height:1.75;}
+  .iq-talk .sp b{color:var(--brand-deep);}
+  .step3{display:flex;flex-direction:column;gap:11px;}
+  .step3 .s{display:flex;gap:13px;align-items:center;background:#fbfcfe;border:1px solid var(--line);border-radius:14px;padding:13px 15px;}
+  .step3 .s .no{width:40px;height:40px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;font-weight:900;}
+  .step3 .s h4{font-size:14px;font-weight:800;}
+  .step3 .s p{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .goal-list{margin:0;padding-left:18px;}
+  .goal-list li{font-size:13.5px;margin-bottom:8px;}
+  .goal-list li b{color:var(--brand-deep);}
+
+  /* ---------- BACK / PAGE TITLE ---------- */
+  .page-top{display:flex;align-items:center;gap:12px;padding:18px 0 8px;position:sticky;top:0;z-index:15;background:linear-gradient(var(--bg),rgba(245,247,251,.7) 80%,transparent);}
+  .back{width:40px;height:40px;border-radius:12px;background:var(--card);box-shadow:var(--shadow-sm);font-size:18px;display:flex;align-items:center;justify-content:center;}
+  .page-top h2{font-size:18px;font-weight:800;}
+  .page-top h2 small{display:block;font-size:11px;font-weight:600;color:var(--ink-soft);}
+
+  .card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:16px;}
+  .card .lead{font-size:13px;color:var(--ink-soft);margin-bottom:4px;}
+
+  /* ---------- GRADES ---------- */
+  .subj{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .subj:last-child{border-bottom:none;}
+  .subj .nm{flex:1;font-weight:700;font-size:14px;}
+  .subj .nm small{display:block;font-size:10.5px;color:var(--ink-soft);font-weight:500;}
+  .stars{display:flex;gap:6px;}
+  .stars .s{width:30px;height:30px;border-radius:9px;background:#eef1f8;color:#c3cad9;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;transition:.12s;}
+  .stars .s.on{background:linear-gradient(135deg,var(--gold),#e89c0a);color:#fff;box-shadow:0 4px 10px -4px rgba(232,156,10,.7);}
+  .stars .s:active{transform:scale(.9);}
+
+  /* ---------- CLUB / CHIPS ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px;}
+  .chip{padding:9px 14px;border-radius:99px;background:#eef1f8;font-size:13px;font-weight:600;color:var(--ink-soft);transition:.12s;border:1.5px solid transparent;}
+  .chip.on{background:var(--brand-soft);color:var(--brand-deep);border-color:var(--brand);}
+  .chip:active{transform:scale(.95);}
+  textarea{width:100%;border:1.5px solid var(--line);border-radius:16px;padding:14px;font-family:inherit;font-size:14px;resize:vertical;min-height:96px;color:var(--ink);background:#fbfcfe;}
+  textarea:focus{outline:none;border-color:var(--brand);background:#fff;}
+
+  .btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+    padding:16px;border-radius:16px;font-weight:800;font-size:15px;color:#fff;
+    background:linear-gradient(135deg,var(--brand),var(--brand-deep));box-shadow:0 12px 24px -10px rgba(58,109,240,.6);transition:.12s;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn.ghost{background:var(--card);color:var(--brand);box-shadow:var(--shadow-sm);border:1px solid var(--line);}
+  .btn.gold{background:linear-gradient(135deg,var(--gold),#e07b1a);box-shadow:0 12px 24px -10px rgba(224,123,26,.6);}
+  .btn[disabled]{opacity:.45;filter:grayscale(.3);box-shadow:none;}
+
+  /* ---------- PERSONA RESULT ---------- */
+  .persona-card{background:linear-gradient(160deg,#fff,#f3f6ff);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid var(--line);text-align:center;margin-bottom:16px;}
+  .persona-emoji{font-size:54px;}
+  .persona-card h3{font-size:21px;font-weight:800;margin-top:6px;}
+  .persona-card .sub{color:var(--brand);font-weight:700;font-size:13px;margin-top:2px;}
+  .persona-card p.desc{font-size:13.5px;color:var(--ink-soft);margin-top:12px;text-align:left;}
+  .axes{margin-top:18px;text-align:left;}
+  .axis{margin-bottom:12px;}
+  .axis .row{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;}
+  .axis .row span:last-child{color:var(--ink-soft);font-weight:600;}
+  .axis .track{height:9px;border-radius:99px;background:#eef1f8;overflow:hidden;}
+  .axis .track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--brand),var(--accent));width:0;transition:width .8s;}
+  .keywords{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:center;}
+  .kw{font-size:12px;font-weight:700;color:var(--brand-deep);background:var(--brand-soft);padding:6px 12px;border-radius:99px;}
+
+  /* ---------- GACHA ---------- */
+  .gacha-stage{text-align:center;padding:10px 0 20px;}
+  .gacha-machine{
+    width:200px;height:240px;margin:6px auto 4px;position:relative;
+  }
+  .gacha-glass{
+    position:absolute;top:0;left:20px;right:20px;height:150px;border-radius:80px 80px 30px 30px;
+    background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,.25) 60%),linear-gradient(160deg,#cfe0ff,#a8c4ff);
+    border:3px solid #fff;box-shadow:inset 0 -10px 24px rgba(35,64,156,.18),var(--shadow);overflow:hidden;
+  }
+  .gacha-balls{position:absolute;inset:0;}
+  .gball{position:absolute;width:38px;height:38px;border-radius:50%;box-shadow:inset -6px -6px 10px rgba(0,0,0,.12);}
+  .gacha-base{position:absolute;bottom:0;left:0;right:0;height:96px;border-radius:24px;background:linear-gradient(160deg,#3a6df0,#23409c);box-shadow:var(--shadow);}
+  .gacha-slot{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:64px;height:30px;border-radius:8px;background:#16245c;box-shadow:inset 0 3px 8px rgba(0,0,0,.5);}
+  .gacha-knob{position:absolute;bottom:32px;right:30px;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#cdd6ea);border:3px solid #fff;}
+  .gacha-machine.shake{animation:shake .4s ease infinite;}
+  @keyframes shake{0%,100%{transform:translateX(0) rotate(0);}25%{transform:translateX(-5px) rotate(-2deg);}75%{transform:translateX(5px) rotate(2deg);}}
+
+  .capsule{width:120px;height:120px;margin:20px auto;position:relative;}
+  .capsule .top,.capsule .bot{position:absolute;left:0;right:0;height:60px;}
+  .capsule .top{top:0;border-radius:60px 60px 0 0;background:linear-gradient(160deg,#ffd76a,#f0a020);}
+  .capsule .bot{bottom:0;border-radius:0 0 60px 60px;background:linear-gradient(160deg,#fff,#dde4f2);}
+  .capsule .mid{position:absolute;top:54px;left:0;right:0;height:12px;background:#23409c;border-radius:4px;z-index:2;}
+  .capsule.pop .top{animation:lidUp .7s forwards;}
+  .capsule.pop .bot{animation:lidDn .7s forwards;}
+  @keyframes lidUp{to{transform:translateY(-90px) rotate(-14deg);opacity:0;}}
+  @keyframes lidDn{to{transform:translateY(60px);opacity:0;}}
+
+  .creature-card{
+    border-radius:24px;padding:4px;box-shadow:var(--shadow);position:relative;overflow:hidden;animation:reveal .6s ease;
+  }
+  @keyframes reveal{from{opacity:0;transform:scale(.7) translateY(20px);}to{opacity:1;transform:none;}}
+  .creature-inner{background:var(--card);border-radius:21px;padding:22px;text-align:center;position:relative;}
+  .rarity{position:absolute;top:14px;right:16px;font-size:12px;font-weight:800;letter-spacing:.1em;}
+  .creature-orb{
+    width:140px;height:140px;border-radius:50%;margin:6px auto 4px;display:flex;align-items:center;justify-content:center;font-size:74px;
+    box-shadow:inset 0 -14px 30px rgba(0,0,0,.12);position:relative;
+  }
+  .creature-orb:after{content:"";position:absolute;top:18px;left:26px;width:34px;height:22px;border-radius:50%;background:rgba(255,255,255,.55);filter:blur(2px);transform:rotate(-20deg);}
+  .creature-name{font-size:23px;font-weight:900;margin-top:8px;letter-spacing:.02em;}
+  .type-badges{display:flex;gap:8px;justify-content:center;margin-top:10px;}
+  .type-badge{font-size:11.5px;font-weight:800;color:#fff;padding:4px 13px;border-radius:99px;letter-spacing:.03em;}
+  .creature-flavor{font-size:12.5px;color:var(--ink-soft);margin-top:14px;font-style:italic;}
+  .stat-block{margin-top:18px;text-align:left;background:#f7f9fd;border-radius:16px;padding:16px;}
+  .stat-block h4{font-size:11px;font-weight:800;color:var(--brand);letter-spacing:.08em;margin-bottom:10px;}
+  .fit-list{display:flex;flex-wrap:wrap;gap:8px;}
+  .fit{font-size:12px;font-weight:700;background:#fff;border:1px solid var(--line);padding:7px 12px;border-radius:12px;box-shadow:var(--shadow-sm);}
+  .fit .em{margin-right:5px;}
+  .dex{font-size:11px;color:#9aa3ba;margin-top:14px;letter-spacing:.05em;}
+
+  /* rarity effects */
+  .rare-banner{font-size:13px;font-weight:900;letter-spacing:.12em;padding:5px 0;margin:-4px -4px 8px;border-radius:20px 20px 0 0;color:#fff;text-align:center;}
+  .creature-card.rar-r{box-shadow:0 0 0 2px rgba(255,255,255,.6) inset,0 18px 40px -10px rgba(58,109,240,.55);}
+  .creature-card.rar-sr{
+    background:linear-gradient(125deg,#ff5fa2,#ffb347,#5fd0ff,#a06bff,#ff5fa2)!important;background-size:300% 300%!important;
+    animation:rainbow 4s linear infinite,reveal .6s ease;box-shadow:0 0 34px -4px rgba(160,107,255,.7);
+  }
+  @keyframes rainbow{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+  .sparkles{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:21px;}
+  .sparkles i{position:absolute;font-size:16px;animation:spk 1.6s ease-in-out infinite;}
+  @keyframes spk{0%,100%{opacity:0;transform:scale(.4);}50%{opacity:1;transform:scale(1.1);}}
+  .flash{position:fixed;inset:0;z-index:55;background:#fff;opacity:0;pointer-events:none;}
+  .flash.go{animation:flash .5s ease;}
+  @keyframes flash{0%{opacity:0;}30%{opacity:.9;}100%{opacity:0;}}
+
+  /* ---------- THEMES ---------- */
+  .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .cat{border-radius:18px;padding:16px;color:#fff;box-shadow:var(--shadow-sm);text-align:left;min-height:104px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;transition:.12s;}
+  .cat:active{transform:scale(.97);}
+  .cat .e{font-size:26px;}
+  .cat h3{font-size:14.5px;font-weight:800;margin-top:auto;}
+  .cat span{font-size:10.5px;opacity:.85;}
+  .cat:before{content:"";position:absolute;right:-20px;bottom:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.14);}
+
+  .theme-item{background:var(--card);border-radius:16px;padding:16px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:11px;display:flex;align-items:center;gap:14px;text-align:left;transition:.12s;width:100%;}
+  .theme-item:active{transform:scale(.98);background:var(--brand-soft);}
+  .theme-item .e{font-size:26px;}
+  .theme-item .tx{flex:1;}
+  .theme-item .tx h3{font-size:15px;font-weight:800;}
+  .theme-item .tx p{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .theme-item .arr{color:#c3cad9;font-size:18px;}
+
+  .hint-head{border-radius:var(--radius);padding:22px;color:#fff;box-shadow:var(--shadow);margin-bottom:16px;position:relative;overflow:hidden;}
+  .hint-head:before{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.13);}
+  .hint-head .e{font-size:40px;}
+  .hint-head h2{font-size:21px;font-weight:900;margin-top:6px;}
+  .hint-head p{font-size:13px;opacity:.92;margin-top:6px;}
+  .hint-sec{background:var(--card);border-radius:18px;padding:18px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:13px;}
+  .hint-sec h4{font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .hint-sec h4 .dot{width:26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .q-list li,.act-list li{font-size:13.5px;margin:0 0 9px;padding-left:4px;color:var(--ink);}
+  .q-list,.act-list{margin:0;padding-left:18px;}
+  .q-list li::marker{color:var(--brand);}
+  .relfields{display:flex;flex-wrap:wrap;gap:8px;}
+  .relfields .rf{font-size:12px;font-weight:700;background:var(--brand-soft);color:var(--brand-deep);padding:6px 12px;border-radius:99px;}
+
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:14px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:60;box-shadow:var(--shadow);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .empty{text-align:center;color:var(--ink-soft);padding:30px 10px;font-size:13px;}
+  .footer-note{text-align:center;font-size:11px;color:#aab2c6;margin:30px 0 10px;}
+  ::-webkit-scrollbar{width:0;}
+
+  /* ---------- FORM FIELDS ---------- */
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;font-weight:800;margin-bottom:7px;}
+  .field label small{font-weight:600;color:var(--ink-soft);margin-left:6px;}
+  input[type=text],input[type=date],select{
+    width:100%;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;
+    font-family:inherit;font-size:14px;color:var(--ink);background:#fbfcfe;-webkit-appearance:none;appearance:none;
+  }
+  input:focus,select:focus{outline:none;border-color:var(--brand);background:#fff;}
+  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%235b6680' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
+
+  /* ---------- STEP / SECTION LABEL ---------- */
+  .step-label{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;color:var(--brand);background:var(--brand-soft);padding:5px 11px;border-radius:99px;margin:0 4px 4px;}
+
+  /* ---------- TREND ---------- */
+  .trend-emoji{font-size:46px;text-align:center;}
+
+  /* ---------- AI BOT ---------- */
+  .bot-fab{position:fixed;right:18px;bottom:22px;z-index:40;width:60px;height:60px;border-radius:50%;
+    background:linear-gradient(135deg,var(--purple),var(--brand));box-shadow:0 14px 30px -8px rgba(139,92,246,.6);
+    display:flex;align-items:center;justify-content:center;font-size:28px;transition:.15s;}
+  .bot-fab:active{transform:scale(.92);}
+  .bot-fab .ping{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:var(--pink);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
+  .bot-panel{position:fixed;right:14px;bottom:90px;z-index:45;width:min(360px,90vw);max-height:70vh;display:none;
+    flex-direction:column;background:var(--card);border-radius:22px;box-shadow:0 24px 60px -16px rgba(29,39,64,.4);border:1px solid var(--line);overflow:hidden;}
+  .bot-panel.open{display:flex;animation:botUp .25s ease;}
+  @keyframes botUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  .bot-head{background:linear-gradient(135deg,var(--purple),var(--brand));color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;}
+  .bot-head .av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .bot-head h4{font-size:14px;font-weight:800;}
+  .bot-head small{display:block;font-size:10.5px;opacity:.85;font-weight:600;}
+  .bot-head .x{margin-left:auto;font-size:20px;color:#fff;opacity:.9;}
+  .bot-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#f7f9fd;}
+  .bubble{max-width:82%;padding:10px 13px;border-radius:15px;font-size:13px;line-height:1.6;box-shadow:var(--shadow-sm);}
+  .bubble.bot{align-self:flex-start;background:#fff;border-bottom-left-radius:5px;border:1px solid var(--line);}
+  .bubble.me{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:5px;}
+  .bot-chips{display:flex;gap:7px;flex-wrap:wrap;padding:10px 12px 4px;}
+  .bot-chips .qc{font-size:11.5px;font-weight:700;color:var(--brand-deep);background:var(--brand-soft);padding:7px 11px;border-radius:99px;border:none;}
+  .bot-input{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid var(--line);background:#fff;}
+  .bot-input input{flex:1;border-radius:99px;padding:11px 15px;}
+  .bot-input button{width:44px;height:44px;border-radius:50%;background:var(--brand);color:#fff;font-size:18px;flex:none;}
+
+  /* ---------- GROUP ---------- */
+  .grp-grid .field textarea{min-height:70px;}
+
+  /* ---------- PROCESS FLOW ---------- */
+  .flow-step{display:flex;gap:14px;position:relative;padding-bottom:22px;}
+  .flow-step:last-child{padding-bottom:0;}
+  .flow-step:not(:last-child):before{content:"";position:absolute;left:21px;top:46px;bottom:-2px;width:2px;background:var(--line);}
+  .flow-num{width:44px;height:44px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:var(--shadow-sm);z-index:1;}
+  .flow-body{flex:1;background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-sm);border:1px solid var(--line);}
+  .flow-body h3{font-size:15px;font-weight:800;}
+  .flow-body p{font-size:12.5px;color:var(--ink-soft);margin-top:3px;}
+  .flow-body .pt{font-size:11.5px;color:var(--brand-deep);background:var(--brand-soft);padding:3px 9px;border-radius:99px;display:inline-block;margin-top:8px;font-weight:700;}
+
+  /* ---------- SCHEDULE / COUNTDOWN ---------- */
+  .sched-item{display:flex;align-items:center;gap:13px;background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-sm);border:1px solid var(--line);margin-bottom:11px;position:relative;overflow:hidden;}
+  .sched-item .ph{width:40px;height:40px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;}
+  .sched-item .si{flex:1;}
+  .sched-item .si h3{font-size:14px;font-weight:800;}
+  .sched-item .si p{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .sched-item .dd{text-align:right;flex:none;}
+  .sched-item .dd .date{font-size:13px;font-weight:800;}
+  .sched-item .dd .left{font-size:10.5px;font-weight:700;margin-top:2px;}
+  .sched-item.past{opacity:.62;}
+  .sched-item.urgent .dd .left{color:var(--pink);}
+  .sched-item.done-ph{background:#f3fbf8;border-color:#bfe9dc;}
+  .countdown-big{background:linear-gradient(135deg,#3a6df0,#23409c);color:#fff;border-radius:var(--radius);padding:22px;text-align:center;box-shadow:var(--shadow);margin-bottom:16px;}
+  .countdown-big .num{font-size:46px;font-weight:900;line-height:1;}
+  .countdown-big .lbl{font-size:13px;opacity:.92;margin-top:6px;}
+
+  /* ---------- EVAL ---------- */
+  .eval-tabs{display:flex;gap:8px;margin-bottom:16px;}
+  .eval-tab{flex:1;padding:11px;border-radius:13px;background:var(--card);box-shadow:var(--shadow-sm);border:1.5px solid var(--line);font-size:12.5px;font-weight:800;color:var(--ink-soft);}
+  .eval-tab.on{background:var(--brand);color:#fff;border-color:var(--brand);box-shadow:0 8px 18px -8px rgba(58,109,240,.6);}
+  .crit{padding:14px 0;border-bottom:1px solid var(--line);}
+  .crit:last-child{border-bottom:none;}
+  .crit .ct{font-size:13.5px;font-weight:800;}
+  .crit .cd{font-size:11px;color:var(--ink-soft);margin:2px 0 10px;}
+  .scale{display:flex;gap:7px;}
+  .scale .sc{flex:1;height:38px;border-radius:11px;background:#eef1f8;color:#b3bccf;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.12s;border:none;}
+  .scale .sc.on{background:linear-gradient(135deg,var(--brand),var(--brand-deep));color:#fff;}
+  .scale .sc.locked{opacity:.55;}
+  .eval-summary .erow{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .eval-summary .erow .nm{font-size:12.5px;font-weight:700;width:96px;}
+  .eval-summary .erow .bar{flex:1;height:10px;border-radius:99px;background:#eef1f8;overflow:hidden;}
+  .eval-summary .erow .bar i{display:block;height:100%;border-radius:99px;}
+  .eval-summary .erow .vv{font-size:12px;font-weight:800;width:34px;text-align:right;}
+  .peer-card{background:#fbfcfe;border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:10px;}
+  .peer-card .ph{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;margin-bottom:4px;}
+  .peer-card .ph .avg{color:var(--brand);}
+  .peer-card .cm{font-size:12px;color:var(--ink-soft);}
+  .del-x{font-size:12px;color:var(--pink);font-weight:700;background:none;}
+</style>
+</head>
+<body>
+
+<!-- ============ LOCK SCREEN ============ -->
+<div id="lock" class="active">
+  <img src="logo.png" alt="SOUEI WORK PALETTE" class="lock-logo">
+  <div class="lock-sub">横浜創英中学校・高等学校 探究ラボ</div>
+  <div class="pin-dots" id="pinDots">
+    <div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
+  </div>
+  <div class="pin-msg" id="pinMsg"></div>
+  <div class="keypad" id="keypad"></div>
+  <div class="lock-hint">入室用PINコードを入力してください</div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div class="app" id="app" style="display:none;">
+  <div class="topbar">
+    <img src="logo.png" alt="SOUEI WORK PALETTE" class="topbar-logo">
+    <div class="spacer"></div>
+    <button class="icon-btn" onclick="lockApp()" title="退室">⏏︎</button>
+  </div>
+
+  <!-- HOME -->
+  <section class="screen active" id="home">
+    <div class="hero hero-slim">
+      <h2>探究を、もっとワクワクに。</h2>
+    </div>
+
+    <div class="hub-wrap"><div class="hub" id="hub"></div></div>
+  </section>
+
+  <!-- GRADES -->
+  <section class="screen" id="grades">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>評点を入力<small>9教科・5段階で選ぼう</small></h2></div>
+    <div class="card">
+      <p class="lead">最近の通知表の評定をタップ。正確でなくてOK、いまの感覚で大丈夫です。</p>
+      <div id="subjList"></div>
+    </div>
+    <button class="btn" onclick="saveGrades()">保存して人物像を見る</button>
+  </section>
+
+  <!-- CLUB -->
+  <section class="screen" id="club">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>部活・活動<small>取り組みを教えて</small></h2></div>
+    <div class="card">
+      <p class="lead">入っている部活・委員会・課外活動を選ぼう（複数OK）</p>
+      <div class="chips" id="clubChips"></div>
+    </div>
+    <div class="card">
+      <p class="lead">どんなことに力を入れている？／頑張ったことは？</p>
+      <textarea id="clubText" placeholder="例：吹奏楽部でパートリーダーをして、後輩に教えながら全体の音をまとめた。本番で失敗しても次にどう活かすか考えるのが好き。"></textarea>
+    </div>
+    <button class="btn" onclick="saveClub()">保存して人物像を見る</button>
+  </section>
+
+  <!-- PERSONA -->
+  <section class="screen" id="persona">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>あなたの人物像<small>いまのデータから見えること</small></h2></div>
+    <div id="personaBody"></div>
+  </section>
+
+  <!-- GACHA -->
+  <section class="screen" id="gacha">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>適性ガチャ<small>カプセルで適性を診断</small></h2></div>
+    <div id="gachaBody"></div>
+  </section>
+
+  <!-- THEMES (categories) -->
+  <section class="screen" id="themes">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>テーマを探す<small>気になる分野を選ぼう</small></h2></div>
+    <div class="cat-grid" id="catGrid"></div>
+    <div class="footer-note">分野を選ぶ → テーマを選ぶ → 探究のヒントが出てきます</div>
+  </section>
+
+  <!-- THEME LIST -->
+  <section class="screen" id="themeList">
+    <div class="page-top"><button class="back" onclick="go('themes')">‹</button><h2 id="themeListTitle">テーマ</h2></div>
+    <div id="themeListBody"></div>
+  </section>
+
+  <!-- THEME DETAIL -->
+  <section class="screen" id="themeDetail">
+    <div class="page-top"><button class="back" onclick="backToThemeList()">‹</button><h2>探究のヒント<small>ここから深掘りしてみよう</small></h2></div>
+    <div id="themeDetailBody"></div>
+  </section>
+
+  <!-- INQUIRY (探求授業とは) -->
+  <section class="screen" id="inquiry">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>探求授業とは？<small>まずはここから知ろう</small></h2></div>
+
+    <div class="iq-hero">
+      <div class="tagline">横浜創英中学校の探求学習</div>
+      <h2>「好き」を原点に、<br>社会とつながる力を。</h2>
+      <p>一人じゃ見つからない答えも、みんなとなら見つかる。それが探求授業です。</p>
+    </div>
+
+    <div class="iq-talk">
+      <img src="ike.png" alt="アイク">
+      <div class="sp">やあ、アイクだよ⭐️<br><b>探求授業</b>って、テストみたいに「決まった正解」をおぼえる授業じゃないんだ。<b>自分が「なんでだろう？」「もっと知りたい！」</b>と思ったことを、自分で調べて、考えて、まわりに伝える授業だよ。</div>
+    </div>
+
+    <div class="hint-sec">
+      <h4><span class="dot" style="background:#e0f4ff;color:#00A0E9;">❓</span>そもそも探求授業ってなに？</h4>
+      <p style="font-size:13.5px;">教科書の答えを写すのではなく、<b>「問い（とい）」を自分でつくって、自分なりの答えにたどりつく</b>学び方。正解は1つじゃないし、調べるほど新しい疑問が出てくる。その“ぐるぐる”こそが探求です。</p>
+    </div>
+
+    <div class="hint-sec">
+      <h4><span class="dot" style="background:#ffe5f2;color:#E4007F;">💖</span>なぜ「好き」から始めるの？</h4>
+      <p style="font-size:13.5px;">人は<b>好きなことだと、もっと知りたくなって自然に深掘りできる</b>から。ゲーム・スポーツ・音楽・食べ物…どんな「好き」でもOK。その好きを「なぜ？」「社会とどうつながる？」と広げると、立派な探求テーマになります。</p>
+    </div>
+
+    <div class="hint-sec">
+      <h4><span class="dot" style="background:#fff3d6;color:#c98a06;">🪜</span>探求の3つのSTEP</h4>
+      <div class="step3">
+        <div class="s"><div class="no" style="background:#00A0E9;">1</div><div><h4>好きを見つける（問いを立てる）</h4><p>興味から「調べてみたいこと」を決める</p></div></div>
+        <div class="s"><div class="no" style="background:#E4007F;">2</div><div><h4>デザインで整える（資料をつくる）</h4><p>調べたことを整理して、伝わる形にまとめる</p></div></div>
+        <div class="s"><div class="no" style="background:#FFC400;">3</div><div><h4>プレゼンで表現する（伝える）</h4><p>みんなの前で発表して、考えをシェアする</p></div></div>
+      </div>
+    </div>
+
+    <div class="hint-sec">
+      <h4><span class="dot" style="background:#eafaf5;color:#10b3a3;">🎯</span>探求授業のゴール（身につく力）</h4>
+      <ul class="goal-list">
+        <li><b>考えて行動できる力</b>（自分・対話・創造のコンピテンシー）</li>
+        <li><b>中学のゴール：</b>世界を知り、社会の一員として自ら発信できる</li>
+        <li><b>グローバルコース：</b>自分の考えや生き方を持ち、課題を見つけて解決していく</li>
+        <li><b>強化する力：</b>共感力（エンパシー）と、伝える力（パブリックリレーション）</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <p class="lead">学校で配られた教材（全体像）</p>
+      <button class="poster-btn" onclick="window.open('inquiry.png','_blank')"><img src="inquiry.png" alt="探求授業とは 全体像"></button>
+      <div class="poster-cap">タップで拡大して見られます</div>
+    </div>
+
+    <div class="iq-talk">
+      <img src="ike.png" alt="アイク">
+      <div class="sp">むずかしく考えなくて大丈夫！<br>まずは <b>「自分とは？」</b> で自分の好きや得意を書き出して、<b>「テーマ探し」</b> でワクワクするテーマを見つけよう。困ったらいつでも右下のアイクに聞いてね⭐️</div>
+    </div>
+    <button class="btn" onclick="go('self')">🧩 「自分とは？」から始める</button>
+    <button class="btn ghost" onclick="go('themes')" style="margin-top:10px;">🔭 テーマを探してみる</button>
+  </section>
+
+  <!-- SELF (自分とは？) -->
+  <section class="screen" id="self">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>自分とは？<small>深掘りして言葉にしてみよう</small></h2></div>
+    <div class="card">
+      <p class="lead">得意・苦手と、その「なぜ」</p>
+      <div class="field"><label>得意な科目</label><input type="text" id="sf_goodSubj" placeholder="例：理科"></div>
+      <div class="field"><label>なぜ得意だと思う？</label><textarea id="sf_goodWhy" placeholder="例：実験で予想が当たるのが楽しいし、観察してまとめるのが好きだから。"></textarea></div>
+      <div class="field"><label>苦手な科目</label><input type="text" id="sf_badSubj" placeholder="例：国語"></div>
+      <div class="field"><label>なぜ苦手だと思う？</label><textarea id="sf_badWhy" placeholder="例：登場人物の気持ちを答える問題で、何が正解か分からなくなるから。"></textarea></div>
+    </div>
+    <div class="card">
+      <p class="lead">将来について</p>
+      <div class="field"><label>将来就きたいお仕事は？<small>まだ無くてもOK</small></label><input type="text" id="sf_job" placeholder="例：獣医さん／まだ迷い中"></div>
+    </div>
+    <div class="card">
+      <p class="lead">1日のスケジュール（生活リズム）</p>
+      <div class="field"><label>試験じゃない日（ふだんの平日）</label><textarea id="sf_weekday" placeholder="例：7:00起床／8:30〜15:30学校／16〜18部活／19夕食／20〜21宿題／22スマホ・動画／24就寝"></textarea></div>
+      <div class="field"><label>試験直前の日</label><textarea id="sf_exam" placeholder="例：朝に暗記／放課後は図書館で2時間／夜は苦手科目を中心に…"></textarea></div>
+      <div class="field"><label>休日の過ごし方</label><textarea id="sf_holiday" placeholder="例：午前はゆっくり、午後は友達と外出。夜はゲームか読書。"></textarea></div>
+    </div>
+    <button class="btn" onclick="saveSelf()">保存する</button>
+  </section>
+
+  <!-- TREND (いまの流行) -->
+  <section class="screen" id="trend">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>いまの流行<small>自分の中でブームなこと</small></h2></div>
+    <div class="card" style="text-align:center;">
+      <div class="trend-emoji">🔥</div>
+      <p class="lead" style="margin-top:6px;">「好き」や「ハマっていること」の中に、探究のタネが隠れています。</p>
+    </div>
+    <div class="card">
+      <div class="field"><label>いま、自分の中で流行していることは？</label><textarea id="tr_what" placeholder="例：レトロゲーム集め／推しのアイドル／カフェ巡り／筋トレ…"></textarea></div>
+      <div class="field"><label>なぜ流行っている（ハマっている）と思う？</label><textarea id="tr_why" placeholder="例：自分だけの『当たり』を見つける感覚が宝探しみたいで楽しいから。友達と語れるのも大きい。"></textarea></div>
+    </div>
+    <button class="btn" onclick="saveTrend()">保存する</button>
+    <div class="footer-note">そのブーム、テーマ探し（STEP3）でAIボットに話してみよう</div>
+  </section>
+
+  <!-- GROUP (グループ討議) -->
+  <section class="screen" id="group">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>グループ討議<small>メンバーで話し合って決める</small></h2></div>
+    <div class="card" id="groupThemeBox"></div>
+    <div class="card grp-grid">
+      <div class="field"><label>メンバー</label><textarea id="gr_members" placeholder="例：山田・佐藤・鈴木・田中"></textarea></div>
+      <div class="field"><label>役割分担<small>司会・記録・調査・発表など</small></label><textarea id="gr_roles" placeholder="例：司会=山田／記録=佐藤／調べ=鈴木／発表=田中"></textarea></div>
+      <div class="field"><label>出たアイデア・意見<small>ブレストメモ</small></label><textarea id="gr_ideas" placeholder="思いついたことを自由に書き出そう（多いほどいい！）"></textarea></div>
+      <div class="field"><label>グループで決めたこと</label><textarea id="gr_decided" placeholder="例：テーマは『食品ロス』に決定。次回までに各自データを1つ持ち寄る。"></textarea></div>
+    </div>
+    <button class="btn" onclick="saveGroup()">保存する</button>
+    <button class="btn ghost" onclick="go('process')" style="margin-top:10px;">🗺️ 次は「進め方の全体像」へ</button>
+  </section>
+
+  <!-- PROCESS (進め方の全体像) -->
+  <section class="screen" id="process">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>進め方の全体像<small>テーマ決定から発表まで</small></h2></div>
+    <div class="card" style="text-align:center;">
+      <p class="lead">探究はこの6ステップで進みます。いま自分たちがどこにいるかを意識しよう。</p>
+    </div>
+    <div id="flowBody"></div>
+    <button class="btn" onclick="go('schedule')" style="margin-top:6px;">📅 発表日から逆算スケジュールを作る</button>
+  </section>
+
+  <!-- SCHEDULE (逆算スケジュール) -->
+  <section class="screen" id="schedule">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>逆算スケジュール<small>発表日からやる事を逆算</small></h2></div>
+    <div class="card">
+      <div class="field"><label>最終発表日を入力</label><input type="date" id="sc_date"></div>
+      <button class="btn" onclick="saveSchedule()">スケジュールを作成</button>
+    </div>
+    <div id="schedBody"></div>
+  </section>
+
+  <!-- EVALUATION (自己評価シート) -->
+  <section class="screen" id="evaluation">
+    <div class="page-top"><button class="back" onclick="go('home')">‹</button><h2>自己評価シート<small>自分・先生・仲間で評価</small></h2></div>
+    <div class="eval-tabs" id="evalTabs">
+      <button class="eval-tab on" data-tab="self" onclick="setEvalTab('self')">🙋 自分</button>
+      <button class="eval-tab" data-tab="teacher" onclick="setEvalTab('teacher')">🧑‍🏫 先生</button>
+      <button class="eval-tab" data-tab="peer" onclick="setEvalTab('peer')">👥 仲間</button>
+      <button class="eval-tab" data-tab="summary" onclick="setEvalTab('summary')">📊 結果</button>
+    </div>
+    <div id="evalBody"></div>
+  </section>
+</div>
+
+<!-- AI BOT (探究テーマ画面で表示) -->
+<button class="bot-fab" id="botFab" onclick="toggleBot()" style="display:none;background:#fff;"><img src="ike.png" alt="アイク" class="bot-ike"><span class="ping">？</span></button>
+<div class="bot-panel" id="botPanel">
+  <div class="bot-head">
+    <div class="av"><img src="ike.png" alt="アイク" class="bot-ike"></div>
+    <div><h4>アイク</h4><small>テーマ探しのヒントを出すよ</small></div>
+    <button class="x" onclick="toggleBot()">×</button>
+  </div>
+  <div class="bot-log" id="botLog"></div>
+  <div class="bot-chips" id="botChips"></div>
+  <div class="bot-input">
+    <input type="text" id="botInput" placeholder="質問を入力…（例：環境のテーマある？）" onkeydown="if(event.key==='Enter')botSend();">
+    <button onclick="botSend()">➤</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+const PIN = "1234";
+const SUBJECTS = [
+  {k:"kokugo", n:"国語", d:"読む・書く・伝える", axis:"language"},
+  {k:"shakai", n:"社会", d:"歴史・地理・公民", axis:"society"},
+  {k:"sugaku", n:"数学", d:"論理・計算・分析", axis:"logic"},
+  {k:"rika",   n:"理科", d:"観察・実験・探究", axis:"logic"},
+  {k:"eigo",   n:"英語", d:"言語・国際・対話", axis:"language"},
+  {k:"ongaku", n:"音楽", d:"表現・感性", axis:"create"},
+  {k:"bijutsu",n:"美術", d:"創造・デザイン", axis:"create"},
+  {k:"hotai",  n:"保健体育", d:"身体・実践・協働", axis:"action"},
+  {k:"gika",   n:"技術・家庭", d:"ものづくり・生活", axis:"create"},
+];
+const CLUBS = ["運動部","文化部","吹奏楽・音楽","美術・デザイン","科学・理科系","プログラミング","生徒会・委員会","ボランティア","英語・国際交流","読書・文芸","ディベート・新聞","起業・探究部","特になし"];
+
+const AXES = [
+  {k:"language", n:"言語・コミュニケーション", e:"💬"},
+  {k:"logic",    n:"論理・探究", e:"🔬"},
+  {k:"society",  n:"社会・洞察", e:"🌏"},
+  {k:"create",   n:"創造・表現", e:"🎨"},
+  {k:"action",   n:"行動・実践", e:"⚡"},
+];
+
+let state = {
+  grades:{}, club:{tags:[], text:""}
+};
+try{ const s=localStorage.getItem("tankyu"); if(s) state=JSON.parse(s); }catch(e){}
+/* migration-safe defaults (既存データを壊さず不足分だけ補う) */
+function ensure(){
+  if(!state.grades) state.grades={};
+  if(!state.club) state.club={tags:[],text:""};
+  if(!state.self) state.self={goodSubj:"",goodWhy:"",badSubj:"",badWhy:"",job:"",weekday:"",exam:"",holiday:""};
+  if(!state.trend) state.trend={what:"",why:""};
+  if(!state.theme) state.theme={name:"",cat:"",note:""};
+  if(!state.group) state.group={members:"",roles:"",ideas:"",decided:""};
+  if(!state.schedule) state.schedule={presentDate:""};
+  if(!state.evalSelf) state.evalSelf={scores:{},comment:""};
+  if(!state.evalTeacher) state.evalTeacher={scores:{},comment:""};
+  if(!state.evalPeers) state.evalPeers=[]; // [{name, scores:{}, comment}]
+}
+ensure();
+function save(){ try{localStorage.setItem("tankyu",JSON.stringify(state));}catch(e){} }
+
+/* ============================================================
+   PIN LOCK
+============================================================ */
+let pinBuf="";
+const keypad=document.getElementById("keypad");
+["1","2","3","4","5","6","7","8","9","clr","0","del"].forEach(v=>{
+  const b=document.createElement("button");
+  if(v==="clr"){b.className="key fn";b.textContent="クリア";b.onclick=()=>{pinBuf="";renderPin();};}
+  else if(v==="del"){b.className="key fn";b.textContent="⌫";b.onclick=()=>{pinBuf=pinBuf.slice(0,-1);renderPin();};}
+  else {b.className="key";b.textContent=v;b.onclick=()=>pinPress(v);}
+  keypad.appendChild(b);
+});
+function pinPress(n){ if(pinBuf.length>=4)return; pinBuf+=n; renderPin(); if(pinBuf.length===4) setTimeout(checkPin,160); }
+function renderPin(){
+  document.querySelectorAll("#pinDots .d").forEach((d,i)=>d.classList.toggle("on",i<pinBuf.length));
+  document.getElementById("pinMsg").textContent="";
+}
+function checkPin(){
+  if(pinBuf===PIN){ enterApp(); }
+  else{
+    document.getElementById("pinMsg").textContent="PINが違います。もう一度。";
+    const dots=document.getElementById("pinDots"); dots.style.animation="shake .4s";
+    setTimeout(()=>{dots.style.animation="";pinBuf="";renderPin();},420);
+  }
+}
+function enterApp(){
+  document.getElementById("lock").classList.remove("active");
+  document.getElementById("lock").style.display="none";
+  document.getElementById("app").style.display="block";
+  buildAll(); go("home");
+}
+function lockApp(){
+  pinBuf="";renderPin();
+  document.getElementById("app").style.display="none";
+  document.getElementById("lock").style.display="flex";
+  document.getElementById("lock").classList.add("active");
+}
+
+/* ============================================================
+   NAV
+============================================================ */
+function go(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  const el=document.getElementById(id); el.classList.add("active");
+  window.scrollTo(0,0);
+  if(id==="home") renderHome();
+  if(id==="persona") renderPersona();
+  if(id==="gacha") renderGachaStart();
+  if(id==="self") loadSelf();
+  if(id==="trend") loadTrend();
+  if(id==="group") loadGroup();
+  if(id==="process") renderFlow();
+  if(id==="schedule") renderSchedule();
+  if(id==="evaluation") renderEval();
+  // AIボットは「テーマを探す」系の画面だけに表示
+  const botScreens=["themes","themeList","themeDetail"];
+  const fab=document.getElementById("botFab");
+  if(botScreens.includes(id)){ fab.style.display="flex"; }
+  else { fab.style.display="none"; document.getElementById("botPanel").classList.remove("open"); }
+}
+function toast(msg){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),1800);
+}
+
+/* ============================================================
+   BUILD STATIC UI
+============================================================ */
+function buildAll(){ buildSubjects(); buildClub(); buildCats(); }
+
+function buildSubjects(){
+  const wrap=document.getElementById("subjList"); wrap.innerHTML="";
+  SUBJECTS.forEach(s=>{
+    const row=document.createElement("div"); row.className="subj";
+    row.innerHTML=`<div class="nm">${s.n}<small>${s.d}</small></div>`;
+    const stars=document.createElement("div"); stars.className="stars";
+    for(let i=1;i<=5;i++){
+      const b=document.createElement("button"); b.className="s"; b.textContent=i;
+      b.onclick=()=>{ state.grades[s.k]=i; save(); paintStars(); };
+      stars.appendChild(b);
+    }
+    row.appendChild(stars); wrap.appendChild(row);
+    row._key=s.k;
+  });
+  paintStars();
+}
+function paintStars(){
+  document.querySelectorAll("#subjList .subj").forEach(row=>{
+    const v=state.grades[row._key]||0;
+    row.querySelectorAll(".s").forEach((b,i)=>b.classList.toggle("on",i<v));
+  });
+}
+
+function buildClub(){
+  const wrap=document.getElementById("clubChips"); wrap.innerHTML="";
+  CLUBS.forEach(c=>{
+    const b=document.createElement("button"); b.className="chip"+(state.club.tags.includes(c)?" on":"");
+    b.textContent=c;
+    b.onclick=()=>{
+      const i=state.club.tags.indexOf(c);
+      if(i>=0)state.club.tags.splice(i,1); else state.club.tags.push(c);
+      save(); b.classList.toggle("on");
+    };
+    wrap.appendChild(b);
+  });
+  document.getElementById("clubText").value=state.club.text||"";
+}
+
+function saveGrades(){ save(); toast("評点を保存しました"); go("persona"); }
+function saveClub(){
+  state.club.text=document.getElementById("clubText").value;
+  save(); toast("活動を保存しました"); go("persona");
+}
+
+/* ============================================================
+   HOME
+============================================================ */
+function renderHome(){
+  renderHub();
+}
+
+/* ============================================================
+   CIRCLE HUB (サークルハブ・ホーム)
+============================================================ */
+/* ロゴ配色（CMYK調）：シアン / マゼンタ / イエロー / グレー */
+const C={c:"#00A0E9",c2:"#66C9F2"}, M={c:"#E4007F",c2:"#F266B0"}, Y={c:"#FFC400",c2:"#FFE066"}, G={c:"#9D9E9E",c2:"#C7C8C8"};
+const HUB_NODES=[
+  {go:"inquiry",   emoji:"💡", label:"探求とは",   color:C.c, c2:C.c2, done:()=>false},
+  {go:"self",      emoji:"🧩", label:"自分とは？", color:M.c, c2:M.c2, done:()=>[state.self.goodSubj,state.self.goodWhy,state.self.badSubj,state.self.badWhy,state.self.job,state.self.weekday,state.self.exam,state.self.holiday].some(v=>(v||"").trim())},
+  {go:"grades",    emoji:"📊", label:"評点入力",   color:Y.c, c2:Y.c2, done:()=>Object.keys(state.grades).length>0},
+  {go:"club",      emoji:"🏃", label:"部活・活動", color:C.c, c2:C.c2, done:()=>state.club.tags.length>0||(state.club.text||"").length>0},
+  {go:"trend",     emoji:"🔥", label:"いまの流行", color:M.c, c2:M.c2, done:()=>(state.trend.what||"").trim()!==""},
+  {go:"gacha",     emoji:"🎰", label:"適性ガチャ", color:Y.c, c2:Y.c2, done:()=>false},
+  {go:"themes",    emoji:"🔭", label:"テーマ探し", color:C.c, c2:C.c2, done:()=>state.theme.name!==""},
+  {go:"group",     emoji:"👥", label:"グループ",   color:M.c, c2:M.c2, done:()=>[state.group.members,state.group.roles,state.group.ideas,state.group.decided].some(v=>(v||"").trim())},
+  {go:"process",   emoji:"🗺️", label:"進め方",     color:Y.c, c2:Y.c2, done:()=>false},
+  {go:"schedule",  emoji:"📅", label:"逆算予定",   color:C.c, c2:C.c2, done:()=>!!state.schedule.presentDate},
+  {go:"evaluation",emoji:"⭐", label:"自己評価",   color:G.c, c2:G.c2, done:()=>!!(Object.keys(state.evalSelf.scores||{}).length||(state.evalPeers||[]).length||Object.keys(state.evalTeacher.scores||{}).length)},
+];
+function hubPolar(r,deg){ const t=deg*Math.PI/180; return [50+r*Math.cos(t), 50+r*Math.sin(t)]; }
+function hubSector(ri,ro,a0,a1){
+  const [x0o,y0o]=hubPolar(ro,a0),[x1o,y1o]=hubPolar(ro,a1);
+  const [x1i,y1i]=hubPolar(ri,a1),[x0i,y0i]=hubPolar(ri,a0);
+  const large=(a1-a0)>180?1:0;
+  return `M${x0o.toFixed(2)} ${y0o.toFixed(2)} A${ro} ${ro} 0 ${large} 1 ${x1o.toFixed(2)} ${y1o.toFixed(2)} L${x1i.toFixed(2)} ${y1i.toFixed(2)} A${ri} ${ri} 0 ${large} 0 ${x0i.toFixed(2)} ${y0i.toFixed(2)} Z`;
+}
+function renderHub(){
+  const hub=document.getElementById("hub"); if(!hub) return;
+  const n=HUB_NODES.length, step=360/n, ri=18, ro=33, nodeR=40.5, gap=3.0;
+  let defs=`<defs>`;
+  HUB_NODES.forEach((nd,i)=>{ defs+=`<linearGradient id="hg${i}" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="${nd.c2}"/><stop offset="1" stop-color="${nd.color}"/></linearGradient>`; });
+  defs+=`</defs>`;
+  let svg=`<svg class="hub-svg" viewBox="0 0 100 100" aria-hidden="true">`+defs;
+  svg+=`<circle cx="50" cy="50" r="${nodeR}" fill="none" stroke="#dfe4f0" stroke-width="0.5" stroke-dasharray="0.4 2.4"/>`;
+  HUB_NODES.forEach((nd,i)=>{
+    const deg=-90+i*step;
+    svg+=`<path d="${hubSector(ri,ro,deg-step/2+gap/2,deg+step/2-gap/2)}" fill="url(#hg${i})"/>`;
+    const [sx,sy]=hubPolar(ro+0.4,deg); const [ex,ey]=hubPolar(nodeR-7,deg);
+    svg+=`<line x1="${sx.toFixed(2)}" y1="${sy.toFixed(2)}" x2="${ex.toFixed(2)}" y2="${ey.toFixed(2)}" stroke="${nd.color}" stroke-width="0.9" opacity="0.4"/>`;
+  });
+  svg+=`</svg>`;
+  let nodes="";
+  HUB_NODES.forEach((nd,i)=>{
+    const deg=-90+i*step; const [x,y]=hubPolar(nodeR,deg);
+    const up = y>66 ? " up":"";
+    const done = nd.done() ? `<span class="chk">✓</span>`:"";
+    nodes+=`<button class="hub-node${up}" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%;" onclick="go('${nd.go}')">
+      <span class="nc" style="color:${nd.color};box-shadow:0 9px 20px -6px ${nd.color}77;">${nd.emoji}${done}</span>
+      <span class="nl">${nd.label}</span></button>`;
+  });
+  const core=`<button class="hub-core" onclick="go('persona')">
+     <span class="ctitle">人物像</span><span class="csub">YOU</span><span class="carrow">タップ ▸</span></button>`;
+  hub.innerHTML=svg+core+nodes;
+}
+
+/* ============================================================
+   PERSONA ANALYSIS
+============================================================ */
+function computeAxes(){
+  // base from grades
+  const sum={language:0,logic:0,society:0,create:0,action:0};
+  const cnt={language:0,logic:0,society:0,create:0,action:0};
+  SUBJECTS.forEach(s=>{ if(state.grades[s.k]){ sum[s.axis]+=state.grades[s.k]; cnt[s.axis]++; }});
+  const score={};
+  AXES.forEach(a=>{ score[a.k]= cnt[a.k]? (sum[a.k]/cnt[a.k])/5*100 : 0; });
+
+  // club influence
+  const txt=(state.club.text||"")+" "+state.club.tags.join(" ");
+  const bump=(axis,v)=>{ score[axis]=Math.min(100,score[axis]+v); };
+  const has=(arr)=>arr.some(w=>txt.includes(w));
+  if(has(["運動","スポーツ","部","試合","チーム","練習","協力","リーダー","まとめ"])) bump("action",10);
+  if(has(["プログラ","科学","理科","実験","データ","分析","研究","数学"])) bump("logic",12);
+  if(has(["美術","デザイン","音楽","吹奏楽","表現","作品","描","create","創"])) bump("create",12);
+  if(has(["英語","国際","交流","発表","新聞","ディベート","伝え","話","プレゼン","教え"])) bump("language",10);
+  if(has(["ボランティア","生徒会","委員","地域","社会","環境","SDG","貢献"])) bump("society",12);
+  return score;
+}
+
+const PERSONAS = [
+  {axis:"logic", emoji:"🔬", name:"探究者タイプ", tag:"Researcher",
+   desc:"物事の「なぜ？」を放っておけない人。筋道を立てて考え、データや根拠で確かめるのが得意。じっくり深掘りする探究にいちばん向いています。",
+   kw:["論理的","好奇心","分析力","粘り強さ"]},
+  {axis:"language", emoji:"💬", name:"伝え手タイプ", tag:"Communicator",
+   desc:"言葉で人とつながる力を持つ人。考えを整理して伝えたり、相手の気持ちをくみ取るのが得意。発信・対話を軸にした探究で輝きます。",
+   kw:["表現力","共感","発信","語学"]},
+  {axis:"society", emoji:"🌏", name:"社会デザイナータイプ", tag:"Changemaker",
+   desc:"世の中の課題に目が向く人。「もっとこうなれば」を考え、人や地域を動かすことに興味がある。社会課題の解決をテーマにすると力を発揮します。",
+   kw:["課題発見","公共心","行動力","視野"]},
+  {axis:"create", emoji:"🎨", name:"創造者タイプ", tag:"Creator",
+   desc:"0から何かを生み出すのが好きな人。感性とアイデアで形にする力がある。ものづくり・デザイン・表現の探究があなたの舞台です。",
+   kw:["発想力","感性","美意識","表現"]},
+  {axis:"action", emoji:"⚡", name:"実践者タイプ", tag:"Doer",
+   desc:"考えるより先に動ける人。仲間と協力し、現場で試しながら学ぶのが得意。フィールドワークや実験的な探究で本領を発揮します。",
+   kw:["行動力","協働","リーダーシップ","実行"]},
+];
+
+function renderPersona(){
+  const body=document.getElementById("personaBody");
+  const g=Object.keys(state.grades).length;
+  const hasClub = state.club.tags.length>0 || (state.club.text||"").length>0;
+  if(g===0 && !hasClub){
+    body.innerHTML=`<div class="card"><p class="lead" style="text-align:center;line-height:1.9;">まだデータがありません。<br>「評点」や「部活・活動」を入力すると、<br>あなたの人物像が自然に見えてきます。</p>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+    <button class="btn ghost" onclick="go('grades')">📊 評点を入力</button>
+    <button class="btn ghost" onclick="go('club')">🏃 部活を入力</button></div></div>`;
+    return;
+  }
+  const score=computeAxes();
+  const sorted=[...AXES].sort((a,b)=>score[b.k]-score[a.k]);
+  const top=sorted[0];
+  const persona=PERSONAS.find(p=>p.axis===top.k);
+  const second=sorted[1];
+  const secLabel = AXES.find(a=>a.k===second.k).n;
+
+  let axesHtml="";
+  sorted.forEach(a=>{
+    const v=Math.round(score[a.k]);
+    axesHtml+=`<div class="axis"><div class="row"><span>${a.e} ${a.n}</span><span>${v}</span></div>
+      <div class="track"><i data-w="${v}"></i></div></div>`;
+  });
+
+  body.innerHTML=`
+    <div class="persona-card">
+      <div class="persona-emoji">${persona.emoji}</div>
+      <h3>${persona.name}</h3>
+      <div class="sub">${persona.tag} ／ 第2の強み：${secLabel}</div>
+      <p class="desc">${persona.desc}</p>
+      <div class="keywords">${persona.kw.map(k=>`<span class="kw">#${k}</span>`).join("")}</div>
+      <div class="axes">${axesHtml}</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <p class="lead">この人物像は、入力するほど精度が上がります。</p>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button class="btn gold" onclick="go('gacha')">🎰 適性ガチャを回す</button>
+        <button class="btn ghost" onclick="go('themes')">🔭 テーマを探す</button>
+      </div>
+    </div>`;
+  requestAnimationFrame(()=>{ body.querySelectorAll(".track i").forEach(i=>i.style.width=i.dataset.w+"%"); });
+}
+
+/* ============================================================
+   GACHA (Pokémon-style)
+============================================================ */
+const CREATURES = [
+  /* ===== LOGIC 論理・探究 ===== */
+  {axis:"logic", name:"スウジン", emoji:"🦫", types:["すうじ","ろんり"], tc:["#5b6cff","#3a3fb0"],
+   grad:["#e3e7ff","#c3caff"], rarity:"★★★", dex:"No.001",
+   flavor:"数字や表を見るとなぜか落ち着く。コツコツ積み上げが得意。",
+   fits:[["📊","会計・データ整理"],["🏦","金融・統計"],["🧮","数学・情報"],["🔧","品質管理"]]},
+  {axis:"logic", name:"ロジカモ", emoji:"🦉", types:["ちえ","たんきゅう"], tc:["#3a6df0","#10b3a3"],
+   grad:["#dbe6ff","#a8c4ff"], rarity:"★★★★", dex:"No.002",
+   flavor:"「なぜ？」を3回くりかえすと進化すると言われている。",
+   fits:[["🔬","研究者・科学者"],["💻","データサイエンティスト"],["🧪","エンジニア"],["🩺","医師・分析職"]]},
+  {axis:"logic", name:"メカリス", emoji:"🤖", types:["かいはつ","せいみつ"], tc:["#23409c","#5fd0ff"],
+   grad:["#d6ecff","#9fd4ff"], rarity:"★★★★★", dex:"No.003",
+   flavor:"頭の中に小さな工場がある。難問ほどギアが回って楽しくなる。",
+   fits:[["🤖","ロボット・AI開発"],["🚀","宇宙・航空"],["🩻","医療技術"],["🏗️","設計・建築"]]},
+  /* ===== LANGUAGE 言語・コミュ ===== */
+  {axis:"language", name:"ハナシカ", emoji:"🦌", types:["おしゃべり","えがお"], tc:["#ff8a5b","#f0567f"],
+   grad:["#ffe7da","#ffcdb8"], rarity:"★★★", dex:"No.004",
+   flavor:"その場の空気をやわらかくする名人。聞き上手で人気者。",
+   fits:[["🛎️","接客・サービス"],["🎙️","司会・MC"],["🧑‍🏫","先生・保育"],["💁","広報・案内"]]},
+  {axis:"language", name:"コトノハ", emoji:"🦜", types:["ことば","つながり"], tc:["#f0567f","#8b5cf6"],
+   grad:["#ffe0ea","#ffc4d6"], rarity:"★★★★", dex:"No.005",
+   flavor:"人の話を聞くほど語彙が増え、鳴き声が美しくなる。",
+   fits:[["✍️","作家・編集者"],["🎤","アナウンサー・記者"],["🌐","通訳・外交"],["🧑‍🏫","教育・先生"]]},
+  {axis:"language", name:"ツタワール", emoji:"🐬", types:["でんたつ","こくさい"], tc:["#1f9d6b","#5fd0ff"],
+   grad:["#d6f7ec","#a8ecd8"], rarity:"★★★★★", dex:"No.006",
+   flavor:"どんな言葉の壁もスイスイ越えていく。世界中に友だちがいる。",
+   fits:[["🌐","通訳・翻訳家"],["🕊️","外交官"],["📚","作家・脚本家"],["🎬","プロデューサー"]]},
+  /* ===== SOCIETY 社会・洞察 ===== */
+  {axis:"society", name:"マチモリ", emoji:"🦝", types:["ちいき","せわやき"], tc:["#1f9d6b","#147a52"],
+   grad:["#d9f7e6","#aeebc8"], rarity:"★★★", dex:"No.007",
+   flavor:"近所のことなら何でも知っている。みんなの困りごとに敏感。",
+   fits:[["🏘️","まちづくり"],["🏪","地域ビジネス"],["🚒","防災・消防"],["🧑‍⚕️","福祉・介護"]]},
+  {axis:"society", name:"セカイヤ", emoji:"🐘", types:["こくさい","しこう"], tc:["#10b3a3","#3a6df0"],
+   grad:["#d9f7f1","#a6ebdf"], rarity:"★★★★", dex:"No.008",
+   flavor:"大きな視野で世界を見渡す。スケールの大きい問題が好物。",
+   fits:[["🌏","国際協力・NGO"],["📰","ジャーナリスト"],["🏫","研究・教育"],["🗺️","地理・環境政策"]]},
+  {axis:"society", name:"ツナグー", emoji:"🦊", types:["しゃかい","こうけん"], tc:["#a06bff","#3a6df0"],
+   grad:["#ece0ff","#cdb8ff"], rarity:"★★★★★", dex:"No.009",
+   flavor:"困っている仲間を見つけると、群れ全体を動かして助けに行く。",
+   fits:[["🏛️","公務員・政策"],["🤝","NPO・社会起業"],["🌱","まちづくり"],["⚖️","法律・人権"]]},
+  /* ===== CREATE 創造・表現 ===== */
+  {axis:"create", name:"ユメガキ", emoji:"🐱", types:["らくがき","ひらめき"], tc:["#f0567f","#f0b429"],
+   grad:["#ffe2ec","#ffd0c0"], rarity:"★★★", dex:"No.010",
+   flavor:"ノートのすみは落書きだらけ。思いついたら描かずにいられない。",
+   fits:[["🎨","イラスト・デザイン"],["📱","UI/UXデザイン"],["🧵","ファッション"],["📸","写真・SNS"]]},
+  {axis:"create", name:"オトカナデ", emoji:"🦢", types:["おんがく","かんせい"], tc:["#8b5cf6","#5fd0ff"],
+   grad:["#ece0ff","#cfe4ff"], rarity:"★★★★", dex:"No.011",
+   flavor:"心が動くと自然とメロディが浮かぶ。音で世界を表現する。",
+   fits:[["🎼","音楽家・作曲"],["🎧","音響・配信"],["🎭","舞台・パフォーマー"],["🎮","ゲーム音楽"]]},
+  {axis:"create", name:"イロドリ", emoji:"🦚", types:["そうぞう","ひょうげん"], tc:["#8b5cf6","#f0b429"],
+   grad:["#efe6ff","#dcc9ff"], rarity:"★★★★★", dex:"No.012",
+   flavor:"見たことのない色を生み出すたび、羽根が一枚増える。",
+   fits:[["🎨","デザイナー・画家"],["🎬","映像・クリエイター"],["🎼","音楽家"],["🏗️","建築・設計"]]},
+  /* ===== ACTION 行動・実践 ===== */
+  {axis:"action", name:"ガッツン", emoji:"🐗", types:["きあい","じっせん"], tc:["#f0b429","#e07b1a"],
+   grad:["#fef0d6","#ffe0b0"], rarity:"★★★", dex:"No.013",
+   flavor:"まず動く、考えるのは走りながら。失敗してもすぐ立ち直る。",
+   fits:[["🏅","スポーツ選手"],["🛠️","ものづくり職人"],["🚜","農業・現場"],["🚑","救命・現場対応"]]},
+  {axis:"action", name:"カケール", emoji:"🐆", types:["こうどう","チーム"], tc:["#f0b429","#f0567f"],
+   grad:["#fef0d6","#ffd9c0"], rarity:"★★★★", dex:"No.014",
+   flavor:"考えるより先に走り出す。仲間といると足が速くなる。",
+   fits:[["🏅","アスリート・指導者"],["🎯","プロジェクトリーダー"],["🚑","救急・消防・防災"],["⚽","スポーツ指導"]]},
+  {axis:"action", name:"ホノオダマ", emoji:"🦁", types:["とうし","リーダー"], tc:["#f0567f","#f0b429"],
+   grad:["#ffe0d6","#ffd0a8"], rarity:"★★★★★", dex:"No.015",
+   flavor:"胸の炎が大きいほど仲間を引っぱる。ピンチでこそ燃え上がる。",
+   fits:[["🚀","起業家・経営者"],["🚒","消防・防災リーダー"],["🎯","チーム監督"],["🏛️","リーダー・政治"]]},
+];
+const RARITY_W={"★★★":6,"★★★★":3,"★★★★★":1}; // 出やすさ（コモンほど高い）
+let lastSpin=null;
+
+function renderGachaStart(){
+  const body=document.getElementById("gachaBody");
+  body.innerHTML=`
+    <div class="card" style="text-align:center;">
+      <p class="lead" style="margin-bottom:4px;">あなたの入力データから、ぴったりの「適性モンスター」を呼び出します。</p>
+      <div class="gacha-stage">
+        <div class="gacha-machine" id="machine">
+          <div class="gacha-glass"><div class="gacha-balls" id="balls"></div></div>
+          <div class="gacha-base"></div>
+          <div class="gacha-slot"></div>
+          <div class="gacha-knob"></div>
+        </div>
+        <button class="btn gold" id="spinBtn" onclick="spin()" style="max-width:260px;margin:8px auto 0;">🎰 ガチャを回す！</button>
+      </div>
+      <p style="font-size:11px;color:#aab2c6;">※評点・部活を入力しているほど、診断が当たりやすくなります</p>
+    </div>`;
+  const balls=document.getElementById("balls");
+  const cols=["#f0567f","#3a6df0","#f0b429","#10b3a3","#8b5cf6","#ff8a5b"];
+  for(let i=0;i<9;i++){
+    const b=document.createElement("div"); b.className="gball";
+    b.style.background=`radial-gradient(circle at 35% 30%, #fff, ${cols[i%cols.length]})`;
+    b.style.left=(8+(i%3)*52)+"px"; b.style.top=(20+Math.floor(i/3)*44)+"px";
+    balls.appendChild(b);
+  }
+}
+
+function weightedPick(pool){
+  const total=pool.reduce((s,c)=>s+(RARITY_W[c.rarity]||1),0);
+  let r=Math.random()*total;
+  for(const c of pool){ r-=(RARITY_W[c.rarity]||1); if(r<=0) return c; }
+  return pool[pool.length-1];
+}
+function pickCreature(){
+  const g=Object.keys(state.grades).length;
+  const hasData = g>0 || state.club.tags.length>0 || (state.club.text||"").length>0;
+  // 入力があれば70%は得意な適性のプールから、30%はサプライズで全体から
+  if(hasData && Math.random()<0.7){
+    const score=computeAxes();
+    const top=[...AXES].sort((a,b)=>score[b.k]-score[a.k])[0];
+    const pool=CREATURES.filter(c=>c.axis===top.k);
+    if(pool.length) return weightedPick(pool);
+  }
+  return weightedPick(CREATURES);
+}
+function rarLevel(c){ const n=(c.rarity.match(/★/g)||[]).length; return n>=5?"sr":(n>=4?"r":"c"); }
+
+function spin(){
+  const m=document.getElementById("machine");
+  const btn=document.getElementById("spinBtn");
+  btn.disabled=true; btn.textContent="ガチャガチャ…";
+  m.classList.add("shake");
+  const c=pickCreature(); lastSpin=c;
+  setTimeout(()=>{ m.classList.remove("shake"); showCapsule(c); },1400);
+}
+
+function showCapsule(c){
+  const lv=rarLevel(c);
+  const capTop = lv==="sr" ? "linear-gradient(160deg,#ffd76a,#f0a020)" : (lv==="r"?"linear-gradient(160deg,#cfe0ff,#8fb4ff)":"linear-gradient(160deg,#e7ecf5,#c3cce0)");
+  const hint = lv==="sr" ? "なんだか…まぶしい…！？" : (lv==="r"?"キラッと光っている…！":"カプセルが出てきた…！");
+  const body=document.getElementById("gachaBody");
+  body.innerHTML=`<div class="card" style="text-align:center;">
+    <p class="lead">${hint}</p>
+    <div class="capsule" id="cap"><div class="top" style="background:${capTop};"></div><div class="mid"></div><div class="bot"></div></div>
+    <button class="btn gold" onclick="openCapsule()" style="max-width:240px;margin:0 auto;">✨ カプセルを開ける</button>
+  </div>`;
+}
+
+function openCapsule(){
+  document.getElementById("cap").classList.add("pop");
+  const lv=rarLevel(lastSpin);
+  if(lv!=="c"){ // レア以上はフラッシュ演出
+    const f=document.createElement("div"); f.className="flash"; document.body.appendChild(f);
+    requestAnimationFrame(()=>f.classList.add("go"));
+    setTimeout(()=>f.remove(),600);
+  }
+  setTimeout(()=>showCreature(lastSpin),650);
+}
+
+function showCreature(c){
+  const lv=rarLevel(c);
+  const rarClass = lv==="sr"?"rar-sr":(lv==="r"?"rar-r":"");
+  const banner = lv==="sr" ? `<div class="rare-banner" style="background:rgba(0,0,0,.12);">✨ 激レア！！ ✨</div>` : "";
+  const sparkles = lv!=="c" ? `<div class="sparkles">${[["8%","10%",0],["86%","14%",.4],["12%","78%",.8],["88%","82%",1.2],["50%","4%",.6]].map(s=>`<i style="left:${s[0]};top:${s[1]};animation-delay:${s[2]}s;">✨</i>`).join("")}</div>` : "";
+  const cardBg = lv==="sr" ? "" : `style="background:linear-gradient(150deg,${c.tc[0]},${c.tc[1]});"`;
+  const body=document.getElementById("gachaBody");
+  body.innerHTML=`
+    <div class="creature-card ${rarClass}" ${cardBg}>
+      ${sparkles}
+      <div class="creature-inner">
+        ${banner}
+        <div class="rarity" style="color:${lv==='sr'?'#e0007a':c.tc[0]};">${c.rarity}</div>
+        <div class="creature-orb" style="background:radial-gradient(circle at 35% 30%, ${c.grad[0]}, ${c.grad[1]});">${c.emoji}</div>
+        <div class="creature-name">${c.name}</div>
+        <div class="type-badges">${c.types.map((t,i)=>`<span class="type-badge" style="background:${c.tc[i%2]};">${t}</span>`).join("")}</div>
+        <div class="creature-flavor">「${c.flavor}」</div>
+        <div class="stat-block">
+          <h4>▶ きみが向いている道</h4>
+          <div class="fit-list">${c.fits.map(f=>`<span class="fit"><span class="em">${f[0]}</span>${f[1]}</span>`).join("")}</div>
+        </div>
+        <div class="dex">図鑑 ${c.dex} ／ 全15体 ・ 探Q LAB 適性モンスター</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <button class="btn ghost" onclick="renderGachaStart()">🔄 もう一度回す</button>
+      <button class="btn" onclick="go('themes')">🔭 関連テーマへ</button>
+    </div>`;
+}
+
+/* ============================================================
+   THEMES
+============================================================ */
+const CATEGORIES = [
+  {k:"env", e:"🌏", n:"環境・サステナビリティ", sub:"地球と未来の話", grad:["#10b3a3","#0e8c7f"]},
+  {k:"tech",e:"🤖", n:"テクノロジー・AI", sub:"未来をつくる技術", grad:["#3a6df0","#23409c"]},
+  {k:"health",e:"🩺", n:"健康・スポーツ・医療", sub:"からだと心", grad:["#f0567f","#c93b5f"]},
+  {k:"society",e:"🏙️", n:"社会・地域・国際", sub:"人と社会のしくみ", grad:["#8b5cf6","#6b46c1"]},
+  {k:"culture",e:"🎨", n:"文化・芸術・表現", sub:"創る・伝える", grad:["#f0b429","#d98a06"]},
+  {k:"food",e:"🍙", n:"食・農業・くらし", sub:"毎日のなぜ", grad:["#ff8a5b","#e36c3a"]},
+  {k:"space",e:"🚀", n:"宇宙・科学のふしぎ", sub:"世界の根っこ", grad:["#5b6cff","#3a3fb0"]},
+  {k:"biz", e:"💡", n:"経済・ビジネス・起業", sub:"お金と仕事", grad:["#1f9d6b","#147a52"]},
+];
+
+const THEMES = {
+  env:[
+    {e:"♻️", n:"プラスチックごみ問題", d:"海と街のゴミを減らすには？",
+      q:["自分の家から1週間で出るプラごみは何g？","なぜプラスチックは分解されにくいの？","レジ袋有料化で本当にゴミは減った？"],
+      how:["1週間、家庭のプラごみを種類別に記録してみる","近所のスーパーの包装を観察・比較する","自治体のごみ統計データを調べる"],
+      fields:["環境科学","化学","政策","デザイン"],
+      act:"「学校で出るプラごみを1割減らす作戦」を考えて掲示してみよう"},
+    {e:"🌡️", n:"気候変動と異常気象", d:"夏が暑くなっているのは本当？",
+      q:["横浜の100年間の平均気温はどう変化した？","ヒートアイランド現象って何が原因？","自分にできる対策に効果はどれくらい？"],
+      how:["気象庁の過去データをグラフ化する","学校周辺の表面温度を温度計で測る","緑地のある場所とない場所を比較する"],
+      fields:["地学","気象学","都市工学","統計"],
+      act:"校庭と教室前の気温を時間ごとに測って、緑の効果を数値で示そう"},
+    {e:"🐝", n:"生物多様性と絶滅危惧種", d:"身近な生き物が減っている？",
+      q:["昔いたのに最近見ない生き物は？","ミツバチが減ると私たちの食卓はどうなる？","外来種はなぜ問題になるの？"],
+      how:["校庭や公園の生き物マップをつくる","祖父母世代に昔の生き物の話を聞く","地域の自然保護団体に取材する"],
+      fields:["生物学","生態学","地理","フィールドワーク"],
+      act:"学校のビオトープ／花壇で見られる生き物を1ヶ月観察記録しよう"},
+  ],
+  tech:[
+    {e:"🧠", n:"AIと人間の共存", d:"AIに任せていい仕事・ダメな仕事は？",
+      q:["AIが得意なこと・苦手なことは何？","AIが書いた作文と人の作文を見分けられる？","10年後、なくなる仕事・増える仕事は？"],
+      how:["生成AIに同じ質問を10回して答えを比べる","大人にAIをどう使っているか取材する","AIの間違い（ハルシネーション）を集める"],
+      fields:["情報科学","倫理","哲学","社会学"],
+      act:"クラスで『AIに任せたい/任せたくないこと』アンケートをとって分析しよう"},
+    {e:"🎮", n:"ゲーム・eスポーツの世界", d:"ゲームは学びになる？",
+      q:["なぜゲームは時間を忘れるほど夢中になる？","eスポーツ選手はどんな練習をしている？","ゲームで身につく力はある？"],
+      how:["人気ゲームの『続けたくなる仕組み』を分析","プレイ時間と集中力の関係を自分で記録","ゲーム業界の仕事を調べる"],
+      fields:["心理学","情報デザイン","ビジネス","プログラミング"],
+      act:"『勉強が続く仕組み』をゲームの工夫から考えて提案しよう"},
+    {e:"🤖", n:"ロボット・自動化", d:"ロボットは暮らしをどう変える？",
+      q:["介護や農業でロボットはどう使われている？","自動運転は何が難しいの？","人と協力するロボットに必要なものは？"],
+      how:["身の回りの『自動化』を10個探す","ロボット展示やニュースを調べる","プログラミングで簡単な制御を試す"],
+      fields:["ロボット工学","機械","電子","AI"],
+      act:"『学校にあったら便利なロボット』をスケッチして仕組みを説明しよう"},
+  ],
+  health:[
+    {e:"😴", n:"睡眠とパフォーマンス", d:"よく寝ると成績は上がる？",
+      q:["中学生に必要な睡眠時間は？","スマホは睡眠にどう影響する？","睡眠と記憶力の関係は？"],
+      how:["2週間、睡眠時間と体調を記録する","就寝前のスマホあり/なしで翌朝を比較","睡眠に関する研究記事を読む"],
+      fields:["保健","生理学","心理学","統計"],
+      act:"自分の睡眠ログをグラフ化して、調子のいい日のパターンを見つけよう"},
+    {e:"🏃", n:"スポーツと科学", d:"速く走る・上手くなる仕組みは？",
+      q:["フォームを変えると本当に速くなる？","スポーツ栄養って何を食べるの？","緊張で力が出ない原因は？"],
+      how:["動画で自分のフォームを撮って分析","タイムや記録を条件を変えて測る","部活の先輩・顧問に取材する"],
+      fields:["スポーツ科学","運動生理学","栄養学","物理"],
+      act:"自分の競技で『記録を伸ばす仮説』を立てて1週間検証しよう"},
+    {e:"🧠", n:"ストレスと心の健康", d:"気持ちの整え方を科学する",
+      q:["なぜ人は緊張・不安を感じるの？","気分転換に本当に効く方法は？","SNSは心にどう影響する？"],
+      how:["自分の気分を毎日5段階で記録する","深呼吸・運動など方法ごとの効果を比べる","信頼できる相談先を調べてまとめる"],
+      fields:["心理学","保健","脳科学","福祉"],
+      act:"クラスで使える『リラックス法カード』をつくって配ろう"},
+  ],
+  society:[
+    {e:"🗳️", n:"18歳選挙権と政治参加", d:"若者の声はどう届く？",
+      q:["なぜ若者の投票率は低いの？","身近な学校・地域の決定に参加するには？","海外の若者はどう政治に関わっている？"],
+      how:["家族や先生に投票についてインタビュー","生徒会の決め方を調べてみる","各国の投票率データを比較する"],
+      fields:["政治学","公民","社会学","国際"],
+      act:"『生徒の声を学校に届ける仕組み』を提案書にまとめよう"},
+    {e:"🌐", n:"多文化共生・SDGs", d:"ちがいを力にする社会とは？",
+      q:["地域に住む外国の人はどんなことに困っている？","SDGsの17目標、自分に一番近いのは？","『やさしい日本語』って何？"],
+      how:["地域の多言語表示を写真で集める","SDGsの目標から1つ選んで深掘り","国際交流イベントに参加・取材する"],
+      fields:["国際関係","言語","福祉","地理"],
+      act:"学校で使える『やさしい日本語の案内表示』をデザインしよう"},
+    {e:"🏚️", n:"地域の課題・まちづくり", d:"自分の街をもっと良くするには？",
+      q:["商店街やバスはなぜ減っている？","若者が街に残る/出ていく理由は？","空き家や空き地を活かすには？"],
+      how:["街を歩いて『困りごとマップ』を作る","お年寄りや店主に昔の街の話を聞く","他の地域の成功例を調べる"],
+      fields:["都市計画","地理","経済","デザイン"],
+      act:"『この街にほしいもの』アイデアを地図に描いて提案しよう"},
+  ],
+  culture:[
+    {e:"🎵", n:"音楽はなぜ心を動かす？", d:"好きな曲の秘密を探る",
+      q:["なぜ悲しい曲・元気な曲があるの？","世界の音楽はどう違う？","音楽は集中力や気分に影響する？"],
+      how:["好きな曲の構成・歌詞を分析する","作業中のBGMありなしで集中を比較","いろんな国・時代の音楽を聴き比べ"],
+      fields:["音楽","心理学","文化人類学","物理(音)"],
+      act:"『勉強がはかどるプレイリスト』を仮説つきで作って検証しよう"},
+    {e:"📖", n:"物語・マンガ・表現", d:"人を惹きつける物語の作り方",
+      q:["ヒット作に共通する展開はある？","キャラクターはどう生まれる？","日本のマンガが世界で人気な理由は？"],
+      how:["好きな作品の『盛り上がる仕組み』を分解","短い物語を自分で書いてみる","海外での受け取られ方を調べる"],
+      fields:["文学","表現","メディア","国際文化"],
+      act:"4コマ／ショートストーリーを作り、なぜ面白いか解説をつけよう"},
+    {e:"🏯", n:"伝統文化と現代", d:"昔のものを今に活かす",
+      q:["和食・祭り・工芸はなぜ続いてきた？","若い世代に伝統を伝えるには？","伝統と最新技術を組み合わせると？"],
+      how:["地域の祭りや工芸を取材する","おじいちゃん世代に体験を聞く","伝統×現代の商品事例を集める"],
+      fields:["歴史","文化","デザイン","観光"],
+      act:"地元の伝統を『今っぽく』PRするポスターを作ろう"},
+  ],
+  food:[
+    {e:"🍚", n:"食品ロスを減らす", d:"捨てられる食べ物を救うには？",
+      q:["日本で1年にどれだけ食べ物が捨てられる？","給食の食べ残しはなぜ起きる？","賞味期限と消費期限の違いは？"],
+      how:["給食・家庭の食べ残しを記録する","スーパーの値引きの仕組みを観察","フードバンクの活動を調べる"],
+      fields:["食品科学","経済","環境","家庭科"],
+      act:"『学校の食べ残しを減らすアイデア』を給食委員に提案しよう"},
+    {e:"🌾", n:"農業とこれからの食", d:"未来は何を食べている？",
+      q:["農家さんが減るとどうなる？","昆虫食や培養肉は広まる？","地元で採れる食べ物（地産地消）の良さは？"],
+      how:["地元の特産や旬の食材を調べる","農家・直売所に取材する","新しい食のニュースを集める"],
+      fields:["農学","食品","環境","ビジネス"],
+      act:"地元食材を使った『未来のメニュー』を考えて栄養も計算しよう"},
+    {e:"🧪", n:"料理の科学", d:"おいしさには理由がある",
+      q:["なぜ加熱で味や色が変わる？","ふくらむ・固まるのはどんな仕組み？","味覚はどうやって感じている？"],
+      how:["条件を変えて同じ料理を作り比べる","温度や時間を記録して結果をまとめる","味の感じ方を友達と実験する"],
+      fields:["化学","生物","家庭科","栄養学"],
+      act:"『○○がもっとおいしくなる条件』を実験して結論を出そう"},
+  ],
+  space:[
+    {e:"🪐", n:"宇宙と私たち", d:"地球の外には何がある？",
+      q:["なぜ宇宙に行きたい人がいるの？","他の星に住むには何が必要？","宇宙ごみ問題って何？"],
+      how:["最新の宇宙ニュースを追いかける","星座や月を観察して記録する","JAXAなどの資料で調べる"],
+      fields:["天文学","物理","宇宙工学","環境"],
+      act:"『火星で暮らす1日』を科学的根拠つきで想像して描こう"},
+    {e:"⚛️", n:"身のまわりの物理・化学", d:"当たり前のなぜを解く",
+      q:["なぜ空は青い？夕焼けは赤い？","電子レンジはどうやって温める？","磁石や静電気の正体は？"],
+      how:["身近な現象を1つ選んで実験する","条件を変えて結果の違いを観察","図や式で仕組みを説明してみる"],
+      fields:["物理","化学","工学","数学"],
+      act:"『家でできる科学実験』を1つ動画にして仕組みを解説しよう"},
+    {e:"🔢", n:"数学が隠れている世界", d:"自然や生活の中の数学",
+      q:["花や貝に数のパターンがある？","暗号やゲームに使われる数学は？","確率を知ると得をする場面は？"],
+      how:["身の回りの形・模様を観察する","気になる数学トピックを1つ深掘り","ゲームやくじの確率を計算する"],
+      fields:["数学","情報","デザイン","自然科学"],
+      act:"『身近に隠れた数学』を3つ見つけて写真と解説でまとめよう"},
+  ],
+  biz:[
+    {e:"🏪", n:"お店・商品のひみつ", d:"なぜ売れる？を分析する",
+      q:["コンビニの陳列に法則はある？","ヒット商品の共通点は？","値段はどうやって決まる？"],
+      how:["お店の並べ方・POPを観察する","友達に『買いたくなる理由』を聞く","売れている商品を調べて比較"],
+      fields:["経営","マーケティング","心理学","経済"],
+      act:"架空の商品を考えて『売れる工夫』をプレゼン資料にしよう"},
+    {e:"🚀", n:"起業・新しい仕事", d:"自分でしごとを生み出す",
+      q:["中高生で起業した人は何をした？","『あったらいいな』をどう仕事にする？","お金の流れ（もうけの仕組み）は？"],
+      how:["身近な不便を10個書き出す","起業家のインタビューを読む","小さなアイデアを企画書にする"],
+      fields:["起業","経済","デザイン","IT"],
+      act:"『学校の困りごとを解決するサービス』を企画書1枚にまとめよう"},
+    {e:"💴", n:"お金と暮らしのリテラシー", d:"知っておきたいお金の話",
+      q:["お小遣いの上手な使い方は？","電子マネーやキャッシュレスの仕組みは？","『投資』『貯金』って何が違う？"],
+      how:["1ヶ月の自分の支出を記録する","キャッシュレスの利点・注意点を調べる","お金の歴史をたどってみる"],
+      fields:["金融","経済","家庭科","社会"],
+      act:"『中学生のためのお金の使い方ガイド』を作って発表しよう"},
+  ],
+};
+
+function buildCats(){
+  const grid=document.getElementById("catGrid"); grid.innerHTML="";
+  CATEGORIES.forEach(c=>{
+    const b=document.createElement("button"); b.className="cat";
+    b.style.background=`linear-gradient(150deg,${c.grad[0]},${c.grad[1]})`;
+    b.innerHTML=`<div class="e">${c.e}</div><div><h3>${c.n}</h3><span>${c.sub}</span></div>`;
+    b.onclick=()=>openThemeList(c.k);
+    grid.appendChild(b);
+  });
+}
+
+function openThemeList(catKey){
+  const cat=CATEGORIES.find(c=>c.k===catKey);
+  document.getElementById("themeListTitle").innerHTML=`${cat.e} ${cat.n}<small>テーマを選んでヒントを見よう</small>`;
+  const body=document.getElementById("themeListBody"); body.innerHTML="";
+  (THEMES[catKey]||[]).forEach((t,i)=>{
+    const b=document.createElement("button"); b.className="theme-item";
+    b.innerHTML=`<div class="e">${t.e}</div><div class="tx"><h3>${t.n}</h3><p>${t.d}</p></div><div class="arr">›</div>`;
+    b.onclick=()=>openThemeDetail(catKey,i);
+    body.appendChild(b);
+  });
+  go("themeList");
+}
+
+let lastCat=null;
+function backToThemeList(){ if(lastCat) openThemeList(lastCat); else go("themes"); }
+
+function openThemeDetail(catKey,idx){
+  lastCat=catKey;
+  const cat=CATEGORIES.find(c=>c.k===catKey);
+  const t=THEMES[catKey][idx];
+  const body=document.getElementById("themeDetailBody");
+  body.innerHTML=`
+    <div class="hint-head" style="background:linear-gradient(150deg,${cat.grad[0]},${cat.grad[1]});">
+      <div class="e">${t.e}</div>
+      <h2>${t.n}</h2>
+      <p>${t.d}</p>
+    </div>
+    <div class="hint-sec">
+      <h4><span class="dot" style="background:#eaf0ff;color:#3a6df0;">❓</span>探究のとい（問い）</h4>
+      <ol class="q-list">${t.q.map(q=>`<li>${q}</li>`).join("")}</ol>
+    </div>
+    <div class="hint-sec">
+      <h4><span class="dot" style="background:#e3faf6;color:#10b3a3;">🔍</span>調べ方・進め方</h4>
+      <ul class="act-list">${t.how.map(h=>`<li>${h}</li>`).join("")}</ul>
+    </div>
+    <div class="hint-sec">
+      <h4><span class="dot" style="background:#fef3d6;color:#c98a06;">🎯</span>まずやってみよう</h4>
+      <p style="font-size:13.5px;">${t.act}</p>
+    </div>
+    <div class="hint-sec">
+      <h4><span class="dot" style="background:#f0eafe;color:#8b5cf6;">🧩</span>つながる分野</h4>
+      <div class="relfields">${t.fields.map(f=>`<span class="rf">${f}</span>`).join("")}</div>
+    </div>
+    <button class="btn" onclick="decideTheme('${cat.e} ${t.n}','${cat.n}')" style="margin-bottom:10px;">✅ このテーマでグループ討議する</button>
+    <button class="btn ghost" onclick="backToThemeList()" style="margin-bottom:10px;">‹ 他のテーマを見る</button>`;
+  go("themeDetail");
+}
+function decideTheme(name,cat){
+  state.theme.name=name; state.theme.cat=cat; save();
+  toast("テーマを決定しました！");
+  go("group");
+}
+
+/* ============================================================
+   SELF / TREND / GROUP  (load & save)
+============================================================ */
+function loadSelf(){
+  const s=state.self;
+  sf_goodSubj.value=s.goodSubj||""; sf_goodWhy.value=s.goodWhy||"";
+  sf_badSubj.value=s.badSubj||""; sf_badWhy.value=s.badWhy||"";
+  sf_job.value=s.job||""; sf_weekday.value=s.weekday||"";
+  sf_exam.value=s.exam||""; sf_holiday.value=s.holiday||"";
+}
+function saveSelf(){
+  state.self={goodSubj:sf_goodSubj.value,goodWhy:sf_goodWhy.value,badSubj:sf_badSubj.value,
+    badWhy:sf_badWhy.value,job:sf_job.value,weekday:sf_weekday.value,exam:sf_exam.value,holiday:sf_holiday.value};
+  save(); toast("「自分とは？」を保存しました"); go("home");
+}
+function loadTrend(){ tr_what.value=state.trend.what||""; tr_why.value=state.trend.why||""; }
+function saveTrend(){ state.trend={what:tr_what.value,why:tr_why.value}; save(); toast("いまの流行を保存しました"); go("home"); }
+
+function loadGroup(){
+  const box=document.getElementById("groupThemeBox");
+  if(state.theme.name){
+    box.innerHTML=`<p class="lead">いま選んでいる探究テーマ</p>
+      <div style="font-size:17px;font-weight:800;margin-top:4px;">${state.theme.name}</div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:3px;">分野：${state.theme.cat||"—"}</div>`;
+  } else {
+    box.innerHTML=`<p class="lead" style="text-align:center;">まだテーマが未決定です。<br>「テーマを探す」から決めると、ここに表示されます。</p>
+      <button class="btn ghost" onclick="go('themes')" style="margin-top:10px;">🔭 テーマを探す</button>`;
+  }
+  const g=state.group;
+  gr_members.value=g.members||""; gr_roles.value=g.roles||""; gr_ideas.value=g.ideas||""; gr_decided.value=g.decided||"";
+}
+function saveGroup(){
+  state.group={members:gr_members.value,roles:gr_roles.value,ideas:gr_ideas.value,decided:gr_decided.value};
+  save(); toast("グループ討議を保存しました"); go("home");
+}
+
+/* ============================================================
+   PROCESS FLOW (進め方の全体像)
+============================================================ */
+const FLOW=[
+  {e:"👥",c:"#3a6df0",n:"グループになる",d:"メンバーを決め、役割（司会・記録・調べ・発表）を分担する。",pt:"目安：全体の 10%"},
+  {e:"🎯",c:"#8b5cf6",n:"テーマを決める",d:"興味から問いを立て、グループで1つのテーマに絞り込む。",pt:"目安：全体の 15%"},
+  {e:"🔍",c:"#10b3a3",n:"調べる・資料を作る",d:"本・ネット・取材・実験で情報を集め、整理・分析してまとめる。",pt:"目安：全体の 35%"},
+  {e:"🎨",c:"#f0b429",n:"デザインする",d:"スライドやポスターを、伝わりやすく見やすい形に整える。",pt:"目安：全体の 15%"},
+  {e:"🎤",c:"#f0567f",n:"発表の練習",d:"声・時間・役割を決めてリハーサル。質問への答えも準備する。",pt:"目安：全体の 15%"},
+  {e:"🏆",c:"#23409c",n:"本番の発表",d:"堂々と発表し、振り返りと自己評価でしめくくる。",pt:"ゴール！"},
+];
+function renderFlow(){
+  const body=document.getElementById("flowBody");
+  body.innerHTML=FLOW.map((f,i)=>`
+    <div class="flow-step">
+      <div class="flow-num" style="background:linear-gradient(135deg,${f.c},${f.c}cc);">${f.e}</div>
+      <div class="flow-body">
+        <h3>${i+1}. ${f.n}</h3>
+        <p>${f.d}</p>
+        <span class="pt">${f.pt}</span>
+      </div>
+    </div>`).join("");
+}
+
+/* ============================================================
+   SCHEDULE (発表日から逆算)
+============================================================ */
+const SCHED_PHASES=[
+  {e:"👥",c:"#3a6df0",n:"グループ結成・役割分担",ratio:0.10},
+  {e:"🎯",c:"#8b5cf6",n:"テーマを決める",ratio:0.15},
+  {e:"🔍",c:"#10b3a3",n:"調査・資料づくり",ratio:0.35},
+  {e:"🎨",c:"#f0b429",n:"デザイン・仕上げ",ratio:0.15},
+  {e:"🎤",c:"#f0567f",n:"発表の練習",ratio:0.15},
+  {e:"🏆",c:"#23409c",n:"最終発表（本番）",ratio:0.10},
+];
+function parseDate(str){ if(!str)return null; const p=str.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
+function fmtDate(d){ const w=["日","月","火","水","木","金","土"]; return `${d.getMonth()+1}/${d.getDate()}(${w[d.getDay()]})`; }
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+function todayDate(){ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+
+function saveSchedule(){
+  const v=document.getElementById("sc_date").value;
+  if(!v){ toast("発表日を選んでください"); return; }
+  state.schedule.presentDate=v; save(); toast("スケジュールを作成しました"); renderSchedule();
+}
+function renderSchedule(){
+  const dateInput=document.getElementById("sc_date");
+  if(state.schedule.presentDate) dateInput.value=state.schedule.presentDate;
+  const body=document.getElementById("schedBody");
+  const present=parseDate(state.schedule.presentDate);
+  if(!present){ body.innerHTML=`<div class="empty">発表日を入力すると、いつまでに何を終わらせるか逆算して表示します。</div>`; return; }
+
+  const today=todayDate();
+  const totalDays=Math.max(7,daysBetween(today,present)); // 期間（最低7日として配分）
+  // 各フェーズの「締め切り日」を比率で逆算（累積）。本番は発表日。
+  let acc=0; const rows=[];
+  for(let i=0;i<SCHED_PHASES.length;i++){
+    const ph=SCHED_PHASES[i];
+    if(i===SCHED_PHASES.length-1){ rows.push({ph,deadline:present}); break; }
+    acc+=ph.ratio;
+    const dl=new Date(today.getTime()+Math.round(totalDays*acc)*86400000);
+    rows.push({ph,deadline:dl});
+  }
+  const left=daysBetween(today,present);
+  let html=`<div class="countdown-big"><div class="num">${left>=0?left:0}</div><div class="lbl">発表本番まで あと ${left>=0?left:0} 日（${fmtDate(present)}）</div></div>`;
+  if(left<0) html=`<div class="countdown-big" style="background:linear-gradient(135deg,#9aa3ba,#6b7488);"><div class="num">終了</div><div class="lbl">発表日（${fmtDate(present)}）は過ぎています</div></div>`;
+
+  html+=rows.map((r,i)=>{
+    const dleft=daysBetween(today,r.deadline);
+    const past=dleft<0;
+    const urgent=!past && dleft<=3;
+    const isLast=i===rows.length-1;
+    const leftTxt = isLast ? (past?"終了":`本番まで ${dleft}日`) : (past?"締切すぎ":`あと ${dleft}日`);
+    return `<div class="sched-item${past?' past':''}${urgent?' urgent':''}${isLast?' done-ph':''}">
+      <div class="ph" style="background:${r.ph.c};">${r.ph.e}</div>
+      <div class="si"><h3>${i+1}. ${r.ph.n}</h3><p>${isLast?'この日が本番！':'までに終わらせる'}</p></div>
+      <div class="dd"><div class="date">${fmtDate(r.deadline)}</div><div class="left">${leftTxt}</div></div>
+    </div>`;
+  }).join("");
+  html+=`<div class="footer-note">※期間を比率で自動配分した目安です。グループの進み具合に合わせて調整しよう。</div>`;
+  body.innerHTML=html;
+}
+
+/* ============================================================
+   EVALUATION (自己評価シート：自己・先生・仲間)
+============================================================ */
+const CRITERIA=[
+  {k:"theme",n:"課題設定",d:"自分なりの問い・テーマを立てられたか"},
+  {k:"research",n:"情報収集",d:"必要な情報を十分に・正しく集められたか"},
+  {k:"analyze",n:"整理・分析",d:"集めた情報を整理し、考察できたか"},
+  {k:"collab",n:"協働",d:"グループで協力し、役割を果たせたか"},
+  {k:"present",n:"表現・発表",d:"伝わりやすく発表・表現できたか"},
+];
+let evalTab="self";
+function setEvalTab(t){ evalTab=t; document.querySelectorAll("#evalTabs .eval-tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t)); renderEval(); }
+function renderEval(){
+  document.querySelectorAll("#evalTabs .eval-tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===evalTab));
+  const body=document.getElementById("evalBody");
+  if(evalTab==="summary"){ body.innerHTML=evalSummaryHtml(); requestAnimationFrame(paintEvalBars); return; }
+  if(evalTab==="peer"){ body.innerHTML=peerFormHtml(); return; }
+  const store = evalTab==="self"?state.evalSelf:state.evalTeacher;
+  const who = evalTab==="self"?"自分":"先生";
+  const accent = evalTab==="self"?"自分自身":"担当の先生が記入";
+  let html=`<div class="card"><p class="lead">${accent}：各項目を5段階で評価しよう（5が最高）</p>`;
+  html+=CRITERIA.map(c=>critHtml(c,store.scores[c.k]||0,evalTab)).join("");
+  html+=`<div class="field" style="margin-top:14px;"><label>コメント・ふりかえり</label><textarea id="ev_comment" placeholder="${who}からのコメント…">${store.comment||""}</textarea></div>`;
+  html+=`</div><button class="btn" onclick="saveEvalMain('${evalTab}')">${who}の評価を保存</button>`;
+  body.innerHTML=html;
+}
+function critHtml(c,val,scope){
+  let scale="";
+  for(let i=1;i<=5;i++) scale+=`<button class="sc${i<=val?' on':''}" onclick="setScore('${scope}','${c.k}',${i})">${i}</button>`;
+  return `<div class="crit"><div class="ct">${c.n}</div><div class="cd">${c.d}</div><div class="scale" data-k="${c.k}">${scale}</div></div>`;
+}
+function setScore(scope,k,v){
+  if(scope==="self") state.evalSelf.scores[k]=v;
+  else if(scope==="teacher") state.evalTeacher.scores[k]=v;
+  else if(scope==="peer") { peerDraft.scores[k]=v; }
+  save();
+  // repaint just this scale
+  const store = scope==="self"?state.evalSelf.scores:(scope==="teacher"?state.evalTeacher.scores:peerDraft.scores);
+  document.querySelectorAll(`.scale[data-k="${k}"] .sc`).forEach((b,i)=>b.classList.toggle("on",(i+1)<=store[k]));
+}
+function saveEvalMain(scope){
+  const cm=document.getElementById("ev_comment");
+  if(scope==="self") state.evalSelf.comment=cm?cm.value:"";
+  else state.evalTeacher.comment=cm?cm.value:"";
+  save(); toast("保存しました");
+}
+let peerDraft={name:"",scores:{},comment:""};
+function peerFormHtml(){
+  peerDraft={name:"",scores:{},comment:""};
+  let html=`<div class="card"><p class="lead">仲間からの評価を追加（発表を見た人が記入）</p>
+    <div class="field"><label>評価する人の名前</label><input type="text" id="peer_name" placeholder="例：佐藤"></div>`;
+  html+=CRITERIA.map(c=>critHtml(c,0,"peer")).join("");
+  html+=`<div class="field" style="margin-top:14px;"><label>ひとことコメント</label><textarea id="peer_comment" placeholder="良かった点・もっと良くなる点"></textarea></div>`;
+  html+=`</div><button class="btn" onclick="addPeer()">この評価を追加する</button>`;
+  // 既存の仲間評価一覧
+  if((state.evalPeers||[]).length){
+    html+=`<div class="section-h"><h2 style="font-size:15px;">これまでの仲間評価</h2><span>${state.evalPeers.length}件</span></div>`;
+    html+=state.evalPeers.map((p,idx)=>{
+      const vals=CRITERIA.map(c=>p.scores[c.k]||0); const avg=(vals.reduce((a,b)=>a+b,0)/CRITERIA.length).toFixed(1);
+      return `<div class="peer-card"><div class="ph"><span>👤 ${p.name||"匿名"}</span><span class="avg">平均 ${avg}</span>
+        <button class="del-x" onclick="delPeer(${idx})">削除</button></div>
+        ${p.comment?`<div class="cm">「${p.comment}」</div>`:""}</div>`;
+    }).join("");
+  }
+  return html;
+}
+function addPeer(){
+  const name=document.getElementById("peer_name").value.trim();
+  const comment=document.getElementById("peer_comment").value.trim();
+  if(Object.keys(peerDraft.scores).length===0){ toast("評価を入力してください"); return; }
+  state.evalPeers.push({name,comment,scores:{...peerDraft.scores}});
+  save(); toast("仲間の評価を追加しました"); renderEval();
+}
+function delPeer(i){ state.evalPeers.splice(i,1); save(); renderEval(); }
+function evalSummaryHtml(){
+  const selfS=state.evalSelf.scores, teachS=state.evalTeacher.scores, peers=state.evalPeers||[];
+  const peerAvg={};
+  CRITERIA.forEach(c=>{ const vs=peers.map(p=>p.scores[c.k]).filter(v=>v); peerAvg[c.k]=vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:0; });
+  const colors={self:"linear-gradient(90deg,#3a6df0,#23409c)",teacher:"linear-gradient(90deg,#10b3a3,#0e8c7f)",peer:"linear-gradient(90deg,#f0567f,#c93b5f)"};
+  let html=`<div class="card"><p class="lead">3つの視点を比べてみよう（5点満点）</p><div style="margin-top:10px;">`;
+  CRITERIA.forEach(c=>{
+    html+=`<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:800;margin-bottom:8px;">${c.n}</div><div class="eval-summary">`;
+    [["self","🙋自分",selfS[c.k]||0],["teacher","🧑‍🏫先生",teachS[c.k]||0],["peer","👥仲間",peerAvg[c.k]||0]].forEach(([key,label,v])=>{
+      html+=`<div class="erow"><span class="nm">${label}</span><div class="bar"><i data-w="${v/5*100}" style="background:${colors[key]};"></i></div><span class="vv">${v?v.toFixed(1):"—"}</span></div>`;
+    });
+    html+=`</div></div>`;
+  });
+  html+=`</div></div>`;
+  // 総合平均
+  const allAvg=(scoresObj)=>{ const vs=CRITERIA.map(c=>scoresObj[c.k]).filter(v=>v); return vs.length?(vs.reduce((a,b)=>a+b,0)/vs.length):0; };
+  const sa=allAvg(selfS), ta=allAvg(teachS);
+  const pa=CRITERIA.map(c=>peerAvg[c.k]).filter(v=>v); const paAvg=pa.length?pa.reduce((a,b)=>a+b,0)/pa.length:0;
+  html+=`<div class="card" style="text-align:center;"><p class="lead">総合平均</p>
+    <div style="display:flex;justify-content:space-around;margin-top:8px;">
+      <div><div style="font-size:26px;font-weight:900;color:#3a6df0;">${sa?sa.toFixed(1):"—"}</div><div style="font-size:11px;color:var(--ink-soft);">自分</div></div>
+      <div><div style="font-size:26px;font-weight:900;color:#10b3a3;">${ta?ta.toFixed(1):"—"}</div><div style="font-size:11px;color:var(--ink-soft);">先生</div></div>
+      <div><div style="font-size:26px;font-weight:900;color:#f0567f;">${paAvg?paAvg.toFixed(1):"—"}</div><div style="font-size:11px;color:var(--ink-soft);">仲間(${peers.length})</div></div>
+    </div></div>`;
+  if(state.evalSelf.comment) html+=`<div class="peer-card"><div class="ph"><span>🙋 自分のふりかえり</span></div><div class="cm">「${state.evalSelf.comment}」</div></div>`;
+  if(state.evalTeacher.comment) html+=`<div class="peer-card"><div class="ph"><span>🧑‍🏫 先生コメント</span></div><div class="cm">「${state.evalTeacher.comment}」</div></div>`;
+  return html;
+}
+function paintEvalBars(){ document.querySelectorAll(".eval-summary .bar i").forEach(i=>{ i.style.width="0"; requestAnimationFrame(()=>i.style.width=i.dataset.w+"%"); i.style.transition="width .7s"; }); }
+
+/* ============================================================
+   AI BOT (オフライン・ルールベースのヒント)
+============================================================ */
+const BOT_CHIPS=["環境のテーマある？","AI・テクノロジーは？","好きなことが活かせる？","テーマの決め方は？","問いの立て方は？"];
+function botKB(text){
+  const t=text.toLowerCase();
+  const cats=[
+    {kw:["環境","エコ","ごみ","ゴミ","プラ","気候","温暖","生き物","sdg","海"],cat:"env"},
+    {kw:["ai","テクノ","ロボット","ゲーム","プログラ","技術","アプリ","it"],cat:"tech"},
+    {kw:["健康","睡眠","スポーツ","運動","医療","ストレス","心","体"],cat:"health"},
+    {kw:["社会","地域","まち","政治","国際","多文化","選挙","ボランティ"],cat:"society"},
+    {kw:["文化","音楽","アート","芸術","マンガ","物語","伝統","表現"],cat:"culture"},
+    {kw:["食","料理","農業","給食","食品","くらし","生活"],cat:"food"},
+    {kw:["宇宙","科学","物理","化学","数学","星","ふしぎ","なぜ"],cat:"space"},
+    {kw:["お金","経済","ビジネス","起業","商品","お店","仕事","マーケ"],cat:"biz"},
+  ];
+  for(const c of cats){ if(c.kw.some(k=>t.includes(k))){
+    const cat=CATEGORIES.find(x=>x.k===c.cat); const list=THEMES[c.cat]||[];
+    const names=list.map(x=>`・${x.e} ${x.n}`).join("\n");
+    return `${cat.e}「${cat.n}」分野だね！例えばこんなテーマがあるよ：\n${names}\n\n気になるものはある？「テーマを探す」の${cat.n}を開くと、問いと進め方のヒントが出るよ。`;
+  }}
+  if(/(決め方|どう決|選び方|迷|わからない|分からない)/.test(t))
+    return "テーマの決め方のコツ💡\n①自分が『なんで？』『気になる！』と思うことを5つ書き出す\n②その中で“調べられそう・身近”なものを選ぶ\n③『〜は本当に〜なのか？』の形で問いにする\nまずは「いまの流行」や「自分とは？」で書いたことから探すのもおすすめ！";
+  if(/(問い|とい|リサーチクエス|質問)/.test(t))
+    return "良い問いの作り方✏️\n・『なぜ?』『どうすれば?』『本当に?』で始める\n・YES/NOだけで終わらず、調べて初めて分かるもの\n例：『睡眠時間と成績は関係あるのか？』『食品ロスはどうすれば減らせるか？』";
+  if(/(好き|趣味|流行|ハマ|興味)/.test(t)){
+    const w=state.trend.what?`きみは今「${state.trend.what}」にハマってるんだね！`:"";
+    return `${w}『好き』は最強のテーマのタネ🌱\nその好きを『なぜ流行ってる?』『どんな仕組み?』『社会とどうつながる?』の視点で見ると探究になるよ。下のチップから分野も選べるよ。`;
+  }
+  if(/(こんにち|やあ|はじめ|hello|hi|助け|ヘルプ)/.test(t))
+    return "こんにちは！アイクだよ⭐️\n探究テーマ探しを手伝うよ。気になる分野（環境・AI・健康・社会・文化・食・科学・ビジネス）を言ってみて。下のボタンからも選べるよ！";
+  return "なるほど！🤔 もう少しヒントが欲しいな。\n『環境』『AI』『健康』『社会』『文化』『食』『科学』『ビジネス』みたいに分野を言ってくれると、ぴったりのテーマを出せるよ。下のボタンも使ってね！";
+}
+let botInited=false;
+function toggleBot(){
+  const p=document.getElementById("botPanel");
+  const open=p.classList.toggle("open");
+  if(open && !botInited){ botInited=true; renderBotChips(); botPush("bot","こんにちは！アイクだよ⭐️\nどんなことに興味がある？下のボタンを押すか、質問を入力してね。"); }
+}
+function renderBotChips(){
+  const wrap=document.getElementById("botChips"); wrap.innerHTML="";
+  BOT_CHIPS.forEach(c=>{ const b=document.createElement("button"); b.className="qc"; b.textContent=c; b.onclick=()=>{ botPush("me",c); setTimeout(()=>botPush("bot",botKB(c)),350); }; wrap.appendChild(b); });
+}
+function botPush(who,text){
+  const log=document.getElementById("botLog");
+  const b=document.createElement("div"); b.className="bubble "+who; b.style.whiteSpace="pre-line"; b.textContent=text;
+  log.appendChild(b); log.scrollTop=log.scrollHeight;
+}
+function botSend(){
+  const inp=document.getElementById("botInput"); const v=inp.value.trim(); if(!v)return;
+  botPush("me",v); inp.value="";
+  setTimeout(()=>botPush("bot",botKB(v)),350);
+}
+</script>
+</body>
+</html>
